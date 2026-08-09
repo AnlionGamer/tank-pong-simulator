@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tank Pong Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            width: 1200px;
+            height: 600px;
+            background: #0a0e27;
+            border: 3px solid #00ff00;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 50px;
+            color: #00ff00;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            z-index: 100;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Middle ground (center divider) */
+        .middle-ground {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                #00ff00 0px,
+                #00ff00 20px,
+                transparent 20px,
+                transparent 40px
+            );
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Game canvas */
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #0a0e27;
+        }
+
+        /* HUD Info */
+        .hud {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff00;
+            font-size: 12px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            z-index: 100;
+        }
+
+        .hud-line {
+            margin: 5px 0;
+        }
+
+        /* Game over overlay */
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 1000;
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        .game-over-overlay.show {
+            display: flex;
+        }
+
+        .game-over-text {
+            font-size: 60px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .game-over-score {
+            font-size: 32px;
+            text-align: center;
+        }
+
+        .restart-button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #00ff00;
+            color: #0a0e27;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .restart-button:hover {
+            background: #00cc00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            color: #00ff00;
+            font-size: 12px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            z-index: 100;
+            text-align: right;
+            max-width: 250px;
+        }
+
+        .instruction-line {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="scoreboard">
+            <div class="score-item">
+                <div class="score-label">TANK A</div>
+                <div id="scoreA">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">TANK B</div>
+                <div id="scoreB">0</div>
+            </div>
+        </div>
+
+        <div class="middle-ground"></div>
+
+        <div class="hud">
+            <div class="hud-line">TANK A STATUS:</div>
+            <div class="hud-line">Position: <span id="posA">0, 0</span></div>
+            <div class="hud-line">Ammo: <span id="ammoA">∞</span></div>
+        </div>
+
+        <div class="instructions">
+            <div class="instruction-line"><strong>CONTROLS:</strong></div>
+            <div class="instruction-line">↑↓←→ or WASD - Move Tank</div>
+            <div class="instruction-line">Mouse - Aim Turret</div>
+            <div class="instruction-line">Left Click - Fire</div>
+            <div class="instruction-line">Space - Reset Game</div>
+        </div>
+
+        <div class="game-over-overlay" id="gameOverOverlay">
+            <div class="game-over-text" id="gameOverText">Game Over</div>
+            <div class="game-over-score" id="gameOverScore">0 : 0</div>
+            <button class="restart-button" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1200;
+        canvas.height = 600;
+
+        // Game constants
+        const GAME_WIDTH = canvas.width;
+        const GAME_HEIGHT = canvas.height;
+        const CENTER_X = GAME_WIDTH / 2;
+        const CENTER_Y = GAME_HEIGHT / 2;
+        const MIDDLE_GROUND_WIDTH = 8;
+        const WINNING_SCORE = 5;
+
+        // Tank A (Player)
+        const tankA = {
+            x: 100,
+            y: CENTER_Y,
+            width: 40,
+            height: 50,
+            speed: 4,
+            color: '#00ff00',
+            turretAngle: 0,
+            turretLength: 25,
+            vx: 0,
+            vy: 0
+        };
+
+        // Tank B (AI)
+        const tankB = {
+            x: GAME_WIDTH - 100,
+            y: CENTER_Y,
+            width: 40,
+            height: 50,
+            speed: 3,
+            color: '#ff0000',
+            turretAngle: Math.PI,
+            turretLength: 25,
+            vx: 0,
+            vy: 0,
+            targetY: CENTER_Y,
+            shootCooldown: 0
+        };
+
+        // Projectiles
+        let projectiles = [];
+
+        // Score
+        let scoreA = 0;
+        let scoreB = 0;
+        let gameActive = true;
+
+        // Input handling
+        const keys = {};
+        let mouseX = GAME_WIDTH / 2;
+        let mouseY = GAME_HEIGHT / 2;
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (!gameActive) {
+                    location.reload();
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        window.addEventListener('click', () => {
+            if (!gameActive) return;
+            fireProjectile(tankA);
+        });
+
+        // Draw tank
+        function drawTank(tank) {
+            // Tank body
+            ctx.fillStyle = tank.color;
+            ctx.shadowColor = tank.color;
+            ctx.shadowBlur = 10;
+            
+            ctx.fillRect(tank.x - tank.width / 2, tank.y - tank.height / 2, tank.width, tank.height);
+
+            // Tank treads (visual detail)
+            ctx.fillStyle = '#333333';
+            ctx.fillRect(tank.x - tank.width / 2, tank.y - tank.height / 2 - 5, tank.width, 3);
+            ctx.fillRect(tank.x - tank.width / 2, tank.y + tank.height / 2 + 2, tank.width, 3);
+
+            // Turret
+            const turretStartX = tank.x;
+            const turretStartY = tank.y;
+            const turretEndX = turretStartX + Math.cos(tank.turretAngle) * tank.turretLength;
+            const turretEndY = turretStartY + Math.sin(tank.turretAngle) * tank.turretLength;
+
+            ctx.strokeStyle = tank.color;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.shadowColor = tank.color;
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.moveTo(turretStartX, turretStartY);
+            ctx.lineTo(turretEndX, turretEndY);
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+        }
+
+        // Fire projectile
+        function fireProjectile(tank) {
+            const projectile = {
+                x: tank.x + Math.cos(tank.turretAngle) * tank.turretLength,
+                y: tank.y + Math.sin(tank.turretAngle) * tank.turretLength,
+                vx: Math.cos(tank.turretAngle) * 7,
+                vy: Math.sin(tank.turretAngle) * 7,
+                radius: 4,
+                color: tank.color,
+                owner: tank === tankA ? 'A' : 'B'
+            };
+            projectiles.push(projectile);
+        }
+
+        // Draw projectiles
+        function drawProjectiles() {
+            projectiles.forEach((proj, index) => {
+                ctx.fillStyle = proj.color;
+                ctx.shadowColor = proj.color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(proj.x, proj.y, proj.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                proj.x += proj.vx;
+                proj.y += proj.vy;
+
+                // Remove projectiles outside bounds
+                if (proj.x < 0 || proj.x > GAME_WIDTH || proj.y < 0 || proj.y > GAME_HEIGHT) {
+                    projectiles.splice(index, 1);
+                }
+
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        // Collision detection - Circle vs Rectangle
+        function circleRectCollision(circle, rect) {
+            const closestX = Math.max(rect.x - rect.width / 2, Math.min(circle.x, rect.x + rect.width / 2));
+            const closestY = Math.max(rect.y - rect.height / 2, Math.min(circle.y, rect.y + rect.height / 2));
+
+            const distX = circle.x - closestX;
+            const distY = circle.y - closestY;
+            const distSquared = distX * distX + distY * distY;
+
+            return distSquared < circle.radius * circle.radius;
+        }
+
+        // Check collisions
+        function checkCollisions() {
+            projectiles.forEach((proj, projIndex) => {
+                // Collision with Tank A
+                if (proj.owner === 'B' && circleRectCollision(proj, tankA)) {
+                    projectiles.splice(projIndex, 1);
+                    scoreB++;
+                    updateScore();
+                    if (scoreB >= WINNING_SCORE) {
+                        endGame('Tank B Wins!');
+                    } else {
+                        resetPositions();
+                    }
+                    return;
+                }
+
+                // Collision with Tank B
+                if (proj.owner === 'A' && circleRectCollision(proj, tankB)) {
+                    projectiles.splice(projIndex, 1);
+                    scoreA++;
+                    updateScore();
+                    if (scoreA >= WINNING_SCORE) {
+                        endGame('Tank A Wins!');
+                    } else {
+                        resetPositions();
+                    }
+                    return;
+                }
+
+                // Collision with middle ground
+                if (proj.x > CENTER_X - MIDDLE_GROUND_WIDTH / 2 - proj.radius &&
+                    proj.x < CENTER_X + MIDDLE_GROUND_WIDTH / 2 + proj.radius) {
+                    projectiles.splice(projIndex, 1);
+                }
+            });
+        }
+
+        // Update Tank A (Player)
+        function updateTankA() {
+            // Movement
+            tankA.vx = 0;
+            tankA.vy = 0;
+
+            if (keys['arrowup'] || keys['w']) tankA.vy = -tankA.speed;
+            if (keys['arrowdown'] || keys['s']) tankA.vy = tankA.speed;
+            if (keys['arrowleft'] || keys['a']) tankA.vx = -tankA.speed;
+            if (keys['arrowright'] || keys['d']) tankA.vx = tankA.speed;
+
+            tankA.x += tankA.vx;
+            tankA.y += tankA.vy;
+
+            // Boundary constraints
+            tankA.x = Math.max(tankA.width / 2, Math.min(tankA.x, CENTER_X - MIDDLE_GROUND_WIDTH / 2 - tankA.width / 2));
+            tankA.y = Math.max(tankA.height / 2, Math.min(tankA.y, GAME_HEIGHT - tankA.height / 2));
+
+            // Turret aiming
+            const dx = mouseX - tankA.x;
+            const dy = mouseY - tankA.y;
+            tankA.turretAngle = Math.atan2(dy, dx);
+
+            // Update HUD
+            document.getElementById('posA').textContent = `${Math.round(tankA.x)}, ${Math.round(tankA.y)}`;
+        }
+
+        // Update Tank B (AI)
+        function updateTankB() {
+            // AI behavior
+            tankB.targetY += (Math.random() - 0.5) * 3;
+            tankB.targetY = Math.max(tankB.height / 2, Math.min(tankB.targetY, GAME_HEIGHT - tankB.height / 2));
+
+            // Move towards target
+            const diff = tankB.targetY - tankB.y;
+            if (Math.abs(diff) > 5) {
+                tankB.vy = diff > 0 ? tankB.speed : -tankB.speed;
+            } else {
+                tankB.vy = 0;
+            }
+
+            tankB.y += tankB.vy;
+
+            // Keep Tank B on right side
+            tankB.x = Math.max(CENTER_X + MIDDLE_GROUND_WIDTH / 2 + tankB.width / 2, Math.min(tankB.x, GAME_WIDTH - tankB.width / 2));
+            tankB.y = Math.max(tankB.height / 2, Math.min(tankB.y, GAME_HEIGHT - tankB.height / 2));
+
+            // AI Turret aiming - aim at Tank A with some prediction
+            const dx = tankA.x - tankB.x;
+            const dy = (tankA.y + tankA.vy * 10) - tankB.y;
+            tankB.turretAngle = Math.atan2(dy, dx);
+
+            // AI shooting
+            tankB.shootCooldown--;
+            if (tankB.shootCooldown <= 0 && Math.random() > 0.95) {
+                fireProjectile(tankB);
+                tankB.shootCooldown = 30;
+            }
+        }
+
+        // Update score display
+        function updateScore() {
+            document.getElementById('scoreA').textContent = scoreA;
+            document.getElementById('scoreB').textContent = scoreB;
+        }
+
+        // Reset positions after hit
+        function resetPositions() {
+            tankA.x = 100;
+            tankA.y = CENTER_Y;
+            tankB.x = GAME_WIDTH - 100;
+            tankB.y = CENTER_Y;
+            projectiles = [];
+        }
+
+        // End game
+        function endGame(message) {
+            gameActive = false;
+            const overlay = document.getElementById('gameOverOverlay');
+            document.getElementById('gameOverText').textContent = message;
+            document.getElementById('gameOverScore').textContent = `${scoreA} : ${scoreB}`;
+            overlay.classList.add('show');
+        }
+
+        // Main game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.fillStyle = '#0a0e27';
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            if (gameActive) {
+                updateTankA();
+                updateTankB();
+                checkCollisions();
+            }
+
+            // Draw everything
+            drawTank(tankA);
+            drawTank(tankB);
+            drawProjectiles();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start game
+        updateScore();
+        gameLoop();
+    </script>
+</body>
+</html>
