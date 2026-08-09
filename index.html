@@ -24,7 +24,7 @@
       <section class="match-panel" aria-label="Match score">
         <div class="score"><span id="scoreA">0</span> — <span id="scoreB">0</span></div>
         <div class="round">ROUND <span id="roundNumber">1</span> · BEST OF 5</div>
-        <div class="difficulty-label" id="difficultyLabel">Difficulty: —</div>
+        <div class="difficulty-label" id="difficultyLabel">Difficulty: not selected</div>
       </section>
 
       <section class="tank-status ai-status" aria-label="AI status">
@@ -41,18 +41,18 @@
 
     <section class="state-panel" id="statePanel" aria-live="polite">
       <div class="state-copy">
-        <h1 id="stateTitle">TANK PONG</h1>
-        <p id="stateMessage">Destroy the opposing tank while evading its fire. Each tank has 3 HP; first to win 3 rounds takes the best-of-five match.</p>
+        <h1 id="stateTitle">SELECT A DIFFICULTY TO START</h1>
+        <p id="stateMessage"><strong>The match will not begin until you choose Easy, Medium, or Hard below.</strong> Destroy the opposing tank while evading its fire. Each tank has 3 HP; first to win 3 rounds takes the best-of-five match.</p>
       </div>
-      <div class="state-actions" id="stateActions">
+      <div class="state-actions" id="stateActions" aria-label="Choose difficulty to start">
         <button class="action-btn difficulty-btn" data-difficulty="easy">
-          EASY<span>Late reactions · slower movement/fire</span>
+          START — EASY<span>Late reactions · slower movement/fire</span>
         </button>
         <button class="action-btn difficulty-btn" data-difficulty="medium">
-          MEDIUM<span>Balanced evasion and aim</span>
+          START — MEDIUM<span>Balanced evasion and aim</span>
         </button>
         <button class="action-btn difficulty-btn" data-difficulty="hard">
-          HARD<span>Early threat reads · aggressive aim</span>
+          START — HARD<span>Early threat reads · aggressive aim</span>
         </button>
       </div>
     </section>
@@ -69,7 +69,7 @@
           <span>Ammo</span><strong>Unlimited</strong>
           <span>Your fire</span><strong id="fireStatus">Ready</strong>
           <span>Position</span><strong id="playerPosition">100, 300</strong>
-          <span>Round state</span><strong id="roundState">Choose difficulty</strong>
+          <span>Round state</span><strong id="roundState">Select difficulty to start</strong>
         </div>
       </div>
 
