@@ -420,7 +420,7 @@
             y: CENTER_Y,
             width: 40,
             height: 50,
-            speed: 3,
+            speed: 3.5,
             color: '#ffaa00',
             turretAngle: Math.PI,
             turretLength: 25,
@@ -430,9 +430,8 @@
             maxHp: 3,
             fireRate: 40,
             fireCooldown: 0,
-            targetY: CENTER_Y,
-            dodgeTimer: 0,
-            dodgeDirection: 1
+            evasionTimer: 0,
+            lastDodgeDirection: 0
         };
 
         // Projectiles
@@ -485,14 +484,14 @@
             
             // Adjust AI stats based on difficulty
             if (difficulty === 'easy') {
-                tankB.speed = 2;
-                tankB.fireRate = 60;
+                tankB.speed = 2.5;
+                tankB.fireRate = 80;
             } else if (difficulty === 'medium') {
-                tankB.speed = 3;
-                tankB.fireRate = 40;
+                tankB.speed = 3.5;
+                tankB.fireRate = 50;
             } else if (difficulty === 'hard') {
-                tankB.speed = 4;
-                tankB.fireRate = 30;
+                tankB.speed = 4.5;
+                tankB.fireRate = 35;
             }
             
             document.getElementById('difficultyOverlay').classList.add('hidden');
@@ -682,57 +681,60 @@
             document.getElementById('hpFillA').style.width = (tankA.hp / tankA.maxHp * 100) + '%';
         }
 
-        // Update Tank B (AI)
+        // Update Tank B (AI) - EVASION FOCUSED
         function updateTankB() {
-            // AI movement with better dodging
-            tankB.dodgeTimer--;
+            // Find nearest incoming projectile from Tank A
+            let nearestProjectile = null;
+            let nearestDistance = Infinity;
             
-            if (tankB.dodgeTimer <= 0) {
-                // Random dodge direction change
-                if (Math.random() > 0.6) {
-                    tankB.dodgeDirection *= -1;
+            projectiles.forEach(proj => {
+                if (proj.owner === 'A') {
+                    const dist = Math.hypot(proj.x - tankB.x, proj.y - tankB.y);
+                    if (dist < nearestDistance) {
+                        nearestDistance = dist;
+                        nearestProjectile = proj;
+                    }
                 }
-                tankB.dodgeTimer = Math.random() * 40 + 20;
+            });
+
+            // Evasion timer and decision making
+            tankB.evasionTimer--;
+            if (tankB.evasionTimer <= 0) {
+                if (nearestProjectile && nearestDistance < 300) {
+                    // Incoming threat detected - dodge
+                    const projDy = nearestProjectile.y - tankB.y;
+                    
+                    if (Math.abs(projDy) < 60) {
+                        // Projectile is close to our Y position - dodge vertically
+                        tankB.lastDodgeDirection = projDy > 0 ? -1 : 1; // Dodge opposite direction
+                    } else {
+                        // Random evasion
+                        tankB.lastDodgeDirection = Math.random() > 0.5 ? 1 : -1;
+                    }
+                    tankB.evasionTimer = Math.random() * 30 + 20;
+                } else {
+                    // No immediate threat - random movement
+                    tankB.lastDodgeDirection = Math.random() > 0.5 ? 1 : -1;
+                    tankB.evasionTimer = Math.random() * 50 + 30;
+                }
             }
 
-            // Move towards target with dodging
-            const distToTarget = Math.abs(tankB.targetY - tankB.y);
-            if (distToTarget > 5) {
-                tankB.targetY += tankB.dodgeDirection * (Math.random() * 3 + 2);
-            } else {
-                tankB.targetY += tankB.dodgeDirection * (Math.random() * 4);
-            }
-            
-            tankB.targetY = Math.max(tankB.height / 2 + 30, Math.min(tankB.targetY, GAME_HEIGHT - tankB.height / 2 - 30));
-
-            const diff = tankB.targetY - tankB.y;
-            if (Math.abs(diff) > 3) {
-                tankB.vy = diff > 0 ? tankB.speed : -tankB.speed;
-            } else {
-                tankB.vy = 0;
-            }
-
+            // Apply movement
+            tankB.vy = tankB.lastDodgeDirection * tankB.speed;
             tankB.y += tankB.vy;
+
+            // Keep Tank B in bounds
             tankB.x = Math.max(CENTER_X + MIDDLE_GROUND_WIDTH / 2 + tankB.width / 2, Math.min(tankB.x, GAME_WIDTH - tankB.width / 2));
             tankB.y = Math.max(tankB.height / 2, Math.min(tankB.y, GAME_HEIGHT - tankB.height / 2));
 
-            // AI aiming with prediction based on difficulty
-            let predictedY = tankA.y;
-            if (difficulty === 'hard') {
-                predictedY = tankA.y + tankA.vy * 20;
-            } else if (difficulty === 'medium') {
-                predictedY = tankA.y + tankA.vy * 8;
-            } else {
-                predictedY = tankA.y + tankA.vy * 2;
-            }
-
+            // AI aiming - aim perpendicular or away to avoid easy hits
             const dx = tankA.x - tankB.x;
-            const dy = predictedY - tankB.y;
+            const dy = (tankA.y + tankB.y) / 2 - tankB.y; // Aim at center height rather than predictively
             tankB.turretAngle = Math.atan2(dy, dx);
 
-            // AI shooting
+            // AI shooting with reduced frequency
             tankB.fireCooldown--;
-            const fireChance = difficulty === 'hard' ? 0.92 : difficulty === 'medium' ? 0.94 : 0.96;
+            const fireChance = difficulty === 'hard' ? 0.90 : difficulty === 'medium' ? 0.93 : 0.96;
             if (tankB.fireCooldown <= 0 && Math.random() > fireChance) {
                 fireProjectile(tankB);
                 tankB.fireCooldown = tankB.fireRate;
@@ -781,9 +783,8 @@
             tankB.y = CENTER_Y;
             tankB.hp = tankB.maxHp;
             tankB.fireCooldown = 0;
-            tankB.targetY = CENTER_Y;
-            tankB.dodgeTimer = 0;
-            tankB.dodgeDirection = 1;
+            tankB.evasionTimer = 0;
+            tankB.lastDodgeDirection = 0;
 
             projectiles = [];
             particles = [];
