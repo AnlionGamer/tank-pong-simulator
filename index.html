@@ -14,7 +14,7 @@
         body {
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #000000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -23,6 +23,92 @@
             overflow: hidden;
             gap: 20px;
             padding: 20px;
+        }
+
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .scoreboard {
+            color: #00ff00;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            text-align: center;
+            display: flex;
+            gap: 80px;
+            justify-content: center;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .score-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .match-score {
+            font-size: 24px;
+            color: #00ff00;
+        }
+
+        .round-label {
+            font-size: 11px;
+            color: #ffff00;
+        }
+
+        .health-display {
+            display: flex;
+            gap: 100px;
+            justify-content: center;
+            width: 100%;
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .health-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .health-label {
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .health-bar-container {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .health-dot {
+            width: 20px;
+            height: 20px;
+            border: 2px solid;
+            border-radius: 3px;
+        }
+
+        .health-dot.full {
+            background: #00ff00;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+
+        .health-dot.empty {
+            background: transparent;
+            border-color: #333333;
         }
 
         .game-wrapper {
@@ -51,32 +137,17 @@
             margin: 5px 0;
         }
 
-        .hp-bar {
-            display: inline-block;
-            width: 80px;
-            height: 8px;
-            background: #222;
-            border: 1px solid #00ff00;
-            margin-left: 5px;
-        }
-
-        .hp-fill {
-            height: 100%;
-            background: #00ff00;
-            width: 100%;
-        }
-
         .game-container {
             position: relative;
             width: 1200px;
             height: 600px;
-            background: #0a0e27;
-            border: 5px solid #0099ff;
-            box-shadow: 0 0 30px rgba(0, 153, 255, 0.3);
+            background: #000000;
+            border: 5px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
             overflow: hidden;
         }
 
-        /* Middle ground (center divider) - 70% transparent */
+        /* Middle ground (center divider) */
         .middle-ground {
             position: absolute;
             left: 50%;
@@ -85,8 +156,8 @@
             height: 100%;
             background: repeating-linear-gradient(
                 to bottom,
-                rgba(255, 0, 255, 0.3) 0px,
-                rgba(255, 0, 255, 0.3) 20px,
+                rgba(0, 255, 255, 0.4) 0px,
+                rgba(0, 255, 255, 0.4) 20px,
                 transparent 20px,
                 transparent 40px
             );
@@ -100,7 +171,7 @@
             display: block;
             width: 100%;
             height: 100%;
-            background: #0a0e27;
+            background: #000000;
         }
 
         /* Game over overlay */
@@ -140,7 +211,7 @@
             padding: 15px 40px;
             font-size: 20px;
             background: #00ff00;
-            color: #0a0e27;
+            color: #000000;
             border: 2px solid #00ff00;
             cursor: pointer;
             font-weight: bold;
@@ -188,7 +259,7 @@
             padding: 15px 30px;
             font-size: 18px;
             background: #00ff00;
-            color: #0a0e27;
+            color: #000000;
             border: 2px solid #00ff00;
             cursor: pointer;
             font-weight: bold;
@@ -233,60 +304,48 @@
             min-width: 150px;
         }
 
-        .top-panel {
-            color: #00ff00;
-            font-size: 16px;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            text-align: center;
-            display: flex;
-            gap: 80px;
-            justify-content: center;
-        }
-
-        .score-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .score-label {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .match-score {
-            font-size: 24px;
-            color: #00ff00;
-        }
-
-        .round-label {
-            font-size: 11px;
-            color: #ffff00;
-        }
-
         .instruction-line {
             margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <div class="top-panel">
-        <div class="score-item">
-            <div class="score-label">TANK A (YOU)</div>
-            <div class="match-score"><span id="scoreA">0</span> - <span id="scoreB">0</span></div>
-            <div class="round-label">Match</div>
+    <div class="top-section">
+        <div class="scoreboard">
+            <div class="score-item">
+                <div class="score-label">TANK A (YOU)</div>
+                <div class="match-score"><span id="scoreA">0</span> - <span id="scoreB">0</span></div>
+                <div class="round-label">Match</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">ROUND <span id="roundNumber">1</span></div>
+                <div class="round-label">BEST OF 3</div>
+            </div>
         </div>
-        <div class="score-item">
-            <div class="score-label">ROUND <span id="roundNumber">1</span></div>
-            <div class="round-label">BEST OF 3</div>
+
+        <div class="health-display">
+            <div class="health-item">
+                <div class="health-label">TANK A HP:</div>
+                <div class="health-bar-container">
+                    <div class="health-dot full" id="hpDot1A"></div>
+                    <div class="health-dot full" id="hpDot2A"></div>
+                    <div class="health-dot full" id="hpDot3A"></div>
+                </div>
+            </div>
+            <div class="health-item">
+                <div class="health-label">TANK B HP:</div>
+                <div class="health-bar-container">
+                    <div class="health-dot full" id="hpDot1B"></div>
+                    <div class="health-dot full" id="hpDot2B"></div>
+                    <div class="health-dot full" id="hpDot3B"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="game-wrapper">
         <div class="left-panel">
-            <div class="hud-title">TANK A STATUS</div>
-            <div class="hud-line">HP: <span class="hp-bar"><span class="hp-fill" id="hpFillA"></span></span></div>
+            <div class="hud-title">INFO</div>
             <div class="hud-line">Fire Rate: <span id="fireRateA">Ready</span></div>
             <div class="hud-line">Pos: <span id="posA">0, 0</span></div>
         </div>
@@ -396,39 +455,39 @@
         let roundActive = true;
         let explosionActive = false;
 
-        // Tank A (Player) - Cyan/Light Blue
+        // Tank A (Player) - Green
         const tankA = {
             x: 100,
             y: CENTER_Y,
             width: 40,
             height: 50,
             speed: 4,
-            color: '#00ffff',
+            color: '#00ff00',
             turretAngle: 0,
             turretLength: 25,
             vx: 0,
             vy: 0,
             hp: 3,
             maxHp: 3,
-            fireRate: 30,
+            fireRate: 60,
             fireCooldown: 0
         };
 
-        // Tank B (AI) - Yellow/Orange
+        // Tank B (AI) - Magenta/Pink
         const tankB = {
             x: GAME_WIDTH - 100,
             y: CENTER_Y,
             width: 40,
             height: 50,
             speed: 3.5,
-            color: '#ffaa00',
+            color: '#ff00ff',
             turretAngle: Math.PI,
             turretLength: 25,
             vx: 0,
             vy: 0,
             hp: 3,
             maxHp: 3,
-            fireRate: 40,
+            fireRate: 100,
             fireCooldown: 0,
             evasionTimer: 0,
             lastDodgeDirection: 0
@@ -484,14 +543,14 @@
             
             // Adjust AI stats based on difficulty
             if (difficulty === 'easy') {
-                tankB.speed = 2.5;
-                tankB.fireRate = 80;
+                tankB.speed = 2;
+                tankB.fireRate = 160;
             } else if (difficulty === 'medium') {
-                tankB.speed = 3.5;
-                tankB.fireRate = 50;
+                tankB.speed = 3;
+                tankB.fireRate = 100;
             } else if (difficulty === 'hard') {
                 tankB.speed = 4.5;
-                tankB.fireRate = 35;
+                tankB.fireRate = 70;
             }
             
             document.getElementById('difficultyOverlay').classList.add('hidden');
@@ -512,7 +571,7 @@
             ctx.fillRect(tank.x - tank.width / 2, tank.y - tank.height / 2 - 5, tank.width, 3);
             ctx.fillRect(tank.x - tank.width / 2, tank.y + tank.height / 2 + 2, tank.width, 3);
 
-            // HP indicator
+            // HP indicator on tank
             const hpBarWidth = tank.width;
             const hpPercent = tank.hp / tank.maxHp;
             ctx.fillStyle = hpPercent > 0.5 ? '#00ff00' : hpPercent > 0.25 ? '#ffff00' : '#ff0000';
@@ -635,7 +694,8 @@
                     projectiles.splice(projIndex, 1);
                     tankA.hp--;
                     playSound('hit');
-                    createExplosion(tankA.x, tankA.y, '#00ffff');
+                    createExplosion(tankA.x, tankA.y, '#00ff00');
+                    updateHealthDisplay();
                     if (tankA.hp <= 0) {
                         endRound('B');
                     }
@@ -646,13 +706,38 @@
                     projectiles.splice(projIndex, 1);
                     tankB.hp--;
                     playSound('hit');
-                    createExplosion(tankB.x, tankB.y, '#ffaa00');
+                    createExplosion(tankB.x, tankB.y, '#ff00ff');
+                    updateHealthDisplay();
                     if (tankB.hp <= 0) {
                         endRound('A');
                     }
                     return;
                 }
             });
+        }
+
+        // Update health display
+        function updateHealthDisplay() {
+            for (let i = 1; i <= 3; i++) {
+                const dotA = document.getElementById(`hpDot${i}A`);
+                const dotB = document.getElementById(`hpDot${i}B`);
+                
+                if (i <= tankA.hp) {
+                    dotA.classList.add('full');
+                    dotA.classList.remove('empty');
+                } else {
+                    dotA.classList.remove('full');
+                    dotA.classList.add('empty');
+                }
+
+                if (i <= tankB.hp) {
+                    dotB.classList.add('full');
+                    dotB.classList.remove('empty');
+                } else {
+                    dotB.classList.remove('full');
+                    dotB.classList.add('empty');
+                }
+            }
         }
 
         // Update Tank A (Player)
@@ -678,7 +763,6 @@
             tankA.fireCooldown--;
             document.getElementById('posA').textContent = `${Math.round(tankA.x)}, ${Math.round(tankA.y)}`;
             document.getElementById('fireRateA').textContent = tankA.fireCooldown > 0 ? `${tankA.fireCooldown}` : 'Ready';
-            document.getElementById('hpFillA').style.width = (tankA.hp / tankA.maxHp * 100) + '%';
         }
 
         // Update Tank B (AI) - EVASION FOCUSED
@@ -719,17 +803,28 @@
                 }
             }
 
+            // Difficulty-based evasion aggressiveness
+            let speedMultiplier = 1;
+            if (difficulty === 'easy') {
+                speedMultiplier = 0.5;
+                tankB.evasionTimer += 2; // Slower decision making
+            } else if (difficulty === 'medium') {
+                speedMultiplier = 0.8;
+            } else if (difficulty === 'hard') {
+                speedMultiplier = 1.2;
+            }
+
             // Apply movement
-            tankB.vy = tankB.lastDodgeDirection * tankB.speed;
+            tankB.vy = tankB.lastDodgeDirection * tankB.speed * speedMultiplier;
             tankB.y += tankB.vy;
 
             // Keep Tank B in bounds
             tankB.x = Math.max(CENTER_X + MIDDLE_GROUND_WIDTH / 2 + tankB.width / 2, Math.min(tankB.x, GAME_WIDTH - tankB.width / 2));
             tankB.y = Math.max(tankB.height / 2, Math.min(tankB.y, GAME_HEIGHT - tankB.height / 2));
 
-            // AI aiming - aim perpendicular or away to avoid easy hits
+            // AI aiming - aim at center height
             const dx = tankA.x - tankB.x;
-            const dy = (tankA.y + tankB.y) / 2 - tankB.y; // Aim at center height rather than predictively
+            const dy = (tankA.y + tankB.y) / 2 - tankB.y;
             tankB.turretAngle = Math.atan2(dy, dx);
 
             // AI shooting with reduced frequency
@@ -753,7 +848,7 @@
                 playSound('explosion');
             } else {
                 matchScoreB++;
-                createExplosion(tankA.x, tankA.y, '#00ffff');
+                createExplosion(tankA.x, tankA.y, '#00ff00');
                 playSound('explosion');
             }
 
@@ -790,6 +885,7 @@
             particles = [];
             explosionActive = false;
             roundActive = true;
+            updateHealthDisplay();
         }
 
         // End game
@@ -804,7 +900,7 @@
 
         // Main game loop
         function gameLoop() {
-            ctx.fillStyle = '#0a0e27';
+            ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
             if (gameActive && roundActive && !gamePaused) {
@@ -822,6 +918,9 @@
 
             requestAnimationFrame(gameLoop);
         }
+
+        // Initialize health display
+        updateHealthDisplay();
 
         // Start
         gameLoop();
