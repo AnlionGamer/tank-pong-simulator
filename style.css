@@ -25,20 +25,20 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
-  padding: 14px;
+  padding: 10px;
   overflow-x: hidden;
 }
 
 button { font: inherit; }
 
 .app {
-  width: min(1220px, 100%);
+  width: min(1220px, 100%, max(760px, calc((100dvh - 350px) * 2)));
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .topbar {
@@ -46,14 +46,14 @@ button { font: inherit; }
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 14px;
-  min-height: 82px;
+  min-height: 68px;
 }
 
 .tank-status {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ai-status { align-items: flex-end; }
@@ -80,23 +80,23 @@ button { font: inherit; }
 
 .effect-readout {
   color: var(--muted);
-  font-size: 11px;
-  min-height: 14px;
+  font-size: 10px;
+  min-height: 12px;
 }
 
 .health-row > strong {
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: .06em;
 }
 
 .hp-bar {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .hp-segment {
   width: 36px;
-  height: 14px;
+  height: 13px;
   border: 2px solid #2a3839;
   background: transparent;
   transform: skewX(-10deg);
@@ -116,62 +116,86 @@ button { font: inherit; }
 
 .match-panel {
   text-align: center;
-  min-width: 230px;
+  min-width: 220px;
   color: var(--arena);
   text-shadow: 0 0 10px rgba(0, 255, 255, .35);
 }
 
 .score {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 900;
   letter-spacing: .08em;
 }
 
 .round {
-  margin-top: 3px;
+  margin-top: 2px;
   color: var(--warning);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .08em;
 }
 
 .difficulty-label {
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .state-panel {
-  min-height: 92px;
+  min-height: 78px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: 16px;
   align-items: center;
   border: 1px solid rgba(0, 255, 255, .32);
   background: linear-gradient(180deg, rgba(3, 16, 18, .98), rgba(0, 7, 8, .98));
-  padding: 14px 16px;
+  padding: 10px 14px;
   box-shadow: inset 0 0 22px rgba(0, 255, 255, .04);
 }
 
+.state-panel.setup {
+  border-color: rgba(255, 255, 0, .78);
+  box-shadow: inset 0 0 24px rgba(255, 255, 0, .07), 0 0 18px rgba(255, 255, 0, .08);
+}
+
+.start-kicker {
+  display: none;
+  margin-bottom: 3px;
+  color: var(--warning);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.state-panel.setup .start-kicker { display: block; }
+
 .state-copy h1 {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: var(--arena);
-  font-size: 19px;
+  font-size: 18px;
   letter-spacing: .06em;
+}
+
+.state-panel.setup .state-copy h1 {
+  color: var(--warning);
+  font-size: clamp(22px, 2vw, 28px);
+  text-shadow: 0 0 12px rgba(255, 255, 0, .35);
 }
 
 .state-copy p {
   margin: 0;
   color: #cbe7e8;
-  line-height: 1.45;
-  font-size: 13px;
+  line-height: 1.35;
+  font-size: 12px;
 }
+
+.state-panel.setup .state-copy p strong { color: #fff; }
 
 .state-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 7px;
 }
 
 .action-btn,
@@ -186,15 +210,21 @@ button { font: inherit; }
 }
 
 .action-btn {
-  min-width: 142px;
-  padding: 10px 12px;
+  min-width: 138px;
+  padding: 9px 11px;
+}
+
+.state-panel.setup .action-btn {
+  border-width: 2px;
+  border-color: var(--warning);
+  color: var(--warning);
 }
 
 .action-btn span {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: #89aeb0;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 400;
   letter-spacing: 0;
 }
@@ -209,6 +239,12 @@ button { font: inherit; }
   transform: translateY(-1px);
 }
 
+.state-panel.setup .action-btn:hover,
+.state-panel.setup .action-btn:focus-visible {
+  background: var(--warning);
+  color: #000;
+}
+
 .action-btn:hover span,
 .action-btn:focus-visible span { color: #052427; }
 
@@ -216,6 +252,7 @@ button { font: inherit; }
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 1;
+  align-self: center;
   background: #000;
   border: 4px solid var(--arena);
   box-shadow: 0 0 26px rgba(0, 255, 255, .28);
@@ -255,29 +292,29 @@ canvas {
 .hud {
   display: grid;
   grid-template-columns: 1fr 1.35fr 1.25fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hud-block {
   min-width: 0;
   border: 1px solid rgba(0, 255, 255, .22);
   background: var(--panel);
-  padding: 11px 12px;
+  padding: 8px 10px;
 }
 
 .hud-block h2 {
-  margin: 0 0 8px;
+  margin: 0 0 5px;
   color: var(--arena);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: .08em;
 }
 
 .hud-grid {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 4px 10px;
+  gap: 2px 9px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .hud-grid strong {
@@ -287,22 +324,22 @@ canvas {
 
 .powerup-legend {
   display: grid;
-  gap: 5px;
+  gap: 3px;
   color: #b9d6d7;
-  font-size: 10px;
-  line-height: 1.35;
+  font-size: 9px;
+  line-height: 1.25;
 }
 
 .legend-item {
   display: grid;
-  grid-template-columns: 10px auto 1fr;
-  gap: 6px;
+  grid-template-columns: 9px auto 1fr;
+  gap: 5px;
   align-items: center;
 }
 
 .legend-item i {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   box-shadow: 0 0 8px currentColor;
 }
@@ -316,10 +353,10 @@ canvas {
 .legend-item.shield i { background: var(--shield); }
 
 .controls p {
-  margin: 0 0 9px;
+  margin: 0 0 6px;
   color: #b9d6d7;
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 10px;
+  line-height: 1.3;
 }
 
 .controls p strong { color: var(--warning); }
@@ -327,12 +364,12 @@ canvas {
 .control-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .small-btn {
-  padding: 7px 10px;
-  font-size: 10px;
+  padding: 5px 8px;
+  font-size: 9px;
 }
 
 .small-btn.primary {
@@ -347,7 +384,21 @@ canvas {
 
 [hidden] { display: none !important; }
 
+@media (max-height: 860px) and (min-width: 901px) {
+  body { padding: 6px 10px; }
+  .app {
+    width: min(1220px, 100%, max(760px, calc((100dvh - 325px) * 2)));
+    gap: 6px;
+  }
+  .topbar { min-height: 60px; }
+  .state-panel { min-height: 70px; padding: 8px 12px; }
+  .state-copy p { font-size: 11px; }
+  .state-panel.setup .state-copy h1 { font-size: 21px; }
+  .hud-block { padding: 6px 9px; }
+}
+
 @media (max-width: 900px) {
+  .app { width: min(100%, 900px); }
   .topbar { grid-template-columns: 1fr 1fr; }
   .match-panel { grid-column: 1 / -1; grid-row: 1; }
   .player-status { grid-column: 1; grid-row: 2; }
