@@ -4,98 +4,87 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tank Pong Simulator</title>
-  <style>
-    :root{--bg:#000;--player:#00ff00;--ai:#ff00ff;--arena:#00ffff;--muted:#8aa}
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
-    body{min-height:100vh;display:flex;justify-content:center;padding:14px;overflow-x:hidden}button{font:inherit}
-    .app{width:min(1220px,100%);display:flex;flex-direction:column;gap:10px}
-    .topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;min-height:72px}
-    .tank-status{display:flex;align-items:center;gap:10px;min-width:0}.tank-status.ai{justify-content:flex-end}
-    .tank-name{font-weight:800;letter-spacing:.06em;white-space:nowrap}.tank-name.player{color:var(--player)}.tank-name.ai{color:var(--ai)}
-    .hp-dots{display:flex;gap:6px}.hp-dot{width:18px;height:18px;border:2px solid #333;border-radius:3px;background:transparent}
-    .hp-dot.player.full{background:var(--player);border-color:var(--player);box-shadow:0 0 8px rgba(0,255,0,.7)}
-    .hp-dot.ai.full{background:var(--ai);border-color:var(--ai);box-shadow:0 0 8px rgba(255,0,255,.7)}
-    .match-panel{text-align:center;min-width:210px;color:var(--arena);text-shadow:0 0 10px rgba(0,255,255,.35)}
-    .score{font-size:26px;font-weight:800;letter-spacing:.08em}.round{margin-top:3px;font-size:12px;color:#ffff00;letter-spacing:.08em}
-    .arena-wrap{position:relative;width:100%;aspect-ratio:2/1;max-height:calc(100vh - 170px);min-height:300px;background:#000;border:4px solid var(--arena);box-shadow:0 0 24px rgba(0,255,255,.25);overflow:hidden}
-    canvas{display:block;width:100%;height:100%;background:#000;cursor:crosshair;touch-action:none}
-    .divider{position:absolute;top:0;left:50%;width:8px;height:100%;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,rgba(0,255,255,.42) 0 20px,transparent 20px 40px);pointer-events:none;z-index:4}
-    .overlay{position:absolute;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);padding:20px;text-align:center}.overlay.show{display:flex}
-    .overlay-card{width:min(620px,94%);border:1px solid rgba(0,255,255,.45);background:rgba(0,10,12,.94);padding:24px;box-shadow:0 0 28px rgba(0,255,255,.12)}
-    .overlay h1,.overlay h2{margin:0 0 12px;color:var(--arena);letter-spacing:.06em}.overlay p{margin:8px 0;color:#d7ffff;line-height:1.4}
-    .difficulty-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px}
-    .action-btn{border:2px solid var(--arena);background:#001517;color:var(--arena);padding:11px 18px;cursor:pointer;font-weight:800;letter-spacing:.04em}.action-btn:hover,.action-btn:focus-visible{background:var(--arena);color:#000;outline:none}
-    .difficulty-note{display:block;margin-top:5px;color:#9cc;font-size:11px;font-weight:normal;letter-spacing:0}.pause-title{font-size:clamp(36px,7vw,64px)}
-    .bottom-info{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;color:#b9ffff;font-size:12px;line-height:1.45}.status-line{color:var(--muted)}.status-line strong{color:var(--arena)}.controls{text-align:right;color:#b9ffff}.controls strong{color:#ffff00}
-    @media(max-width:720px){body{padding:8px}.topbar{grid-template-columns:1fr 1fr}.match-panel{grid-column:1/-1;grid-row:1}.tank-status{grid-row:2}.tank-status.ai{justify-content:flex-end}.tank-name{font-size:12px}.hp-dot{width:15px;height:15px}.arena-wrap{min-height:240px;max-height:none}.bottom-info{grid-template-columns:1fr}.controls{text-align:left}}
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="app">
     <section class="topbar" aria-label="Match status">
-      <div class="tank-status"><span class="tank-name player">YOU</span><div class="hp-dots" id="hpA" aria-label="Player health"></div></div>
-      <div class="match-panel"><div class="score"><span id="scoreA">0</span> — <span id="scoreB">0</span></div><div class="round">ROUND <span id="roundNumber">1</span> · BEST OF 3</div></div>
-      <div class="tank-status ai"><div class="hp-dots" id="hpB" aria-label="AI health"></div><span class="tank-name ai">AI</span></div>
+      <div class="tank-status">
+        <span class="tank-name player">YOU</span>
+        <div class="hp-dots" id="hpA" aria-label="Player health"></div>
+      </div>
+
+      <div class="match-panel">
+        <div class="score"><span id="scoreA">0</span> — <span id="scoreB">0</span></div>
+        <div class="round">ROUND <span id="roundNumber">1</span> · BEST OF 3</div>
+      </div>
+
+      <div class="tank-status ai">
+        <div class="hp-dots" id="hpB" aria-label="AI health"></div>
+        <span class="tank-name ai">AI</span>
+      </div>
     </section>
+
     <section class="arena-wrap">
-      <canvas id="gameCanvas" width="1200" height="600" aria-label="Tank Pong play field"></canvas><div class="divider" aria-hidden="true"></div>
-      <div class="overlay show" id="difficultyOverlay"><div class="overlay-card"><h1>TANK PONG</h1><p>Each tank has 3 HP. Win two rounds to take the best-of-three match.</p><p>Shots cross the center line; tanks stay on their own half.</p><div class="difficulty-buttons"><button class="action-btn difficulty-btn" data-difficulty="easy">EASY<span class="difficulty-note">Slower reactions and fire</span></button><button class="action-btn difficulty-btn" data-difficulty="medium">MEDIUM<span class="difficulty-note">Balanced opponent</span></button><button class="action-btn difficulty-btn" data-difficulty="hard">HARD<span class="difficulty-note">Faster reactions and aim</span></button></div></div></div>
-      <div class="overlay" id="roundOverlay"><div class="overlay-card"><h2 id="roundResult">ROUND OVER</h2><p id="roundSummary"></p><button class="action-btn" id="continueButton">CONTINUE</button><p>Press Space to continue.</p></div></div>
-      <div class="overlay" id="pauseOverlay"><div class="overlay-card"><h2 class="pause-title">PAUSED</h2><p>Press P to resume.</p></div></div>
-      <div class="overlay" id="gameOverOverlay"><div class="overlay-card"><h2 id="gameOverText">MATCH OVER</h2><p id="gameOverScore"></p><button class="action-btn" id="restartButton">PLAY AGAIN</button></div></div>
+      <canvas id="gameCanvas" width="1200" height="600" aria-label="Tank Pong play field"></canvas>
+      <div class="divider" aria-hidden="true"></div>
+
+      <div class="overlay show" id="difficultyOverlay">
+        <div class="overlay-card">
+          <h1>TANK PONG</h1>
+          <p>Each tank has 3 HP. Deplete the opponent's HP to win a round. First to two round wins takes the best-of-three match.</p>
+          <p>Shots cross the center line; tanks stay on their own half.</p>
+          <div class="difficulty-buttons">
+            <button class="action-btn difficulty-btn" data-difficulty="easy">
+              EASY<span class="difficulty-note">Slower reactions and fire</span>
+            </button>
+            <button class="action-btn difficulty-btn" data-difficulty="medium">
+              MEDIUM<span class="difficulty-note">Balanced opponent</span>
+            </button>
+            <button class="action-btn difficulty-btn" data-difficulty="hard">
+              HARD<span class="difficulty-note">Faster reactions and aim</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" id="roundOverlay">
+        <div class="overlay-card">
+          <h2 id="roundResult">ROUND OVER</h2>
+          <p id="roundSummary"></p>
+          <button class="action-btn" id="continueButton">CONTINUE</button>
+          <p>Press Space to continue.</p>
+        </div>
+      </div>
+
+      <div class="overlay" id="pauseOverlay">
+        <div class="overlay-card">
+          <h2 class="pause-title">PAUSED</h2>
+          <p>Press P to resume.</p>
+        </div>
+      </div>
+
+      <div class="overlay" id="gameOverOverlay">
+        <div class="overlay-card">
+          <h2 id="gameOverText">MATCH OVER</h2>
+          <p id="gameOverScore"></p>
+          <button class="action-btn" id="restartButton">PLAY AGAIN</button>
+        </div>
+      </div>
     </section>
-    <section class="bottom-info"><div class="status-line"><strong id="difficultyLabel">Difficulty: —</strong><span> · Fire: <span id="fireStatus">Ready</span></span><span> · Player position: <span id="playerPosition">100, 300</span></span></div><div class="controls"><strong>Controls:</strong> WASD / Arrow Keys move · Mouse aims · Left Click fires · P pauses</div></section>
+
+    <section class="bottom-info">
+      <div class="status-line">
+        <strong id="difficultyLabel">Difficulty: —</strong>
+        <span> · Fire: <span id="fireStatus">Ready</span></span>
+        <span> · Player position: <span id="playerPosition">100, 300</span></span>
+      </div>
+      <div class="controls">
+        <strong>Controls:</strong> WASD / Arrow Keys move · Mouse aims · Left Click fires · P pauses
+      </div>
+    </section>
   </main>
-  <script>
-  (()=>{
-    'use strict';
-    const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
-    const W=canvas.width,H=canvas.height,CX=W/2,CY=H/2,DIVIDER=8,HP=3,WINS=2,SHOT_SPEED=420;
-    const difficultyOverlay=document.getElementById('difficultyOverlay'),roundOverlay=document.getElementById('roundOverlay'),pauseOverlay=document.getElementById('pauseOverlay'),gameOverOverlay=document.getElementById('gameOverOverlay');
-    const DIFF={
-      easy:{speed:120,fire:2.65,react:.26,horizon:.85,lead:.25,wobble:54,aimTolerance:.42},
-      medium:{speed:180,fire:1.65,react:.16,horizon:1.05,lead:.55,wobble:28,aimTolerance:.30},
-      hard:{speed:270,fire:1.15,react:.09,horizon:1.25,lead:.85,wobble:10,aimTolerance:.20}
-    };
-    const state={started:false,paused:false,roundActive:false,matchOver:false,difficulty:null,scoreA:0,scoreB:0,round:1,lastTime:performance.now()};
-    const tankA={x:100,y:CY,width:40,height:50,speed:240,color:'#00ff00',turretAngle:0,turretLength:25,vx:0,vy:0,hp:HP,maxHp:HP,fireCooldown:0,fireInterval:1};
-    const tankB={x:W-100,y:CY,width:40,height:50,speed:180,color:'#ff00ff',turretAngle:Math.PI,turretLength:25,vx:0,vy:0,hp:HP,maxHp:HP,fireCooldown:0,fireInterval:1.65,decisionCooldown:0,dodgeDirection:1,wanderTimer:0,aimError:0};
-    let projectiles=[],particles=[],mouseX=CX,mouseY=CY,audioContext=null;const keys=new Set();
-    const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 
-    function ensureAudio(){if(!audioContext){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioContext=new AC()}if(audioContext?.state==='suspended')audioContext.resume().catch(()=>{})}
-    function sound(type){ensureAudio();if(!audioContext)return;const osc=audioContext.createOscillator(),gain=audioContext.createGain(),now=audioContext.currentTime,s={fire:[720,.07,.10],hit:[320,.12,.16],explosion:[150,.16,.32],gameover:[220,.12,.55]}[type]||[400,.08,.1];osc.connect(gain);gain.connect(audioContext.destination);osc.frequency.setValueAtTime(s[0],now);gain.gain.setValueAtTime(s[1],now);gain.gain.exponentialRampToValueAtTime(.001,now+s[2]);osc.start(now);osc.stop(now+s[2])}
-    function buildHealth(){for(const [id,cls] of [['hpA','player'],['hpB','ai']]){const el=document.getElementById(id);el.innerHTML='';for(let i=0;i<HP;i++){const d=document.createElement('span');d.className=`hp-dot ${cls} full`;el.appendChild(d)}}}
-    function hud(){document.getElementById('scoreA').textContent=state.scoreA;document.getElementById('scoreB').textContent=state.scoreB;document.getElementById('roundNumber').textContent=state.round;document.getElementById('playerPosition').textContent=`${Math.round(tankA.x)}, ${Math.round(tankA.y)}`;document.getElementById('fireStatus').textContent=tankA.fireCooldown>0?`${tankA.fireCooldown.toFixed(1)}s`:'Ready';document.getElementById('difficultyLabel').textContent=state.difficulty?`Difficulty: ${state.difficulty[0].toUpperCase()}${state.difficulty.slice(1)}`:'Difficulty: —';document.querySelectorAll('#hpA .hp-dot').forEach((d,i)=>d.classList.toggle('full',i<tankA.hp));document.querySelectorAll('#hpB .hp-dot').forEach((d,i)=>d.classList.toggle('full',i<tankB.hp))}
-    function mouseFrom(e){const r=canvas.getBoundingClientRect();mouseX=(e.clientX-r.left)*(canvas.width/r.width);mouseY=(e.clientY-r.top)*(canvas.height/r.height)}
-    function resetRound(){Object.assign(tankA,{x:100,y:CY,vx:0,vy:0,hp:HP,fireCooldown:0});Object.assign(tankB,{x:W-100,y:CY,vx:0,vy:0,hp:HP,fireCooldown:Math.min(.75,tankB.fireInterval*.5),decisionCooldown:0,dodgeDirection:Math.random()<.5?-1:1,wanderTimer:0,aimError:0});projectiles=[];particles=[];mouseX=CX;mouseY=CY;state.roundActive=true;hud()}
-    function startGame(level){state.difficulty=level;state.started=true;state.paused=false;state.roundActive=true;state.matchOver=false;state.scoreA=0;state.scoreB=0;state.round=1;tankB.speed=DIFF[level].speed;tankB.fireInterval=DIFF[level].fire;difficultyOverlay.classList.remove('show');resetRound();state.lastTime=performance.now()}
-    function pause(){if(!state.started||state.matchOver||!state.roundActive)return;state.paused=!state.paused;pauseOverlay.classList.toggle('show',state.paused);state.lastTime=performance.now()}
-    function fire(tank){projectiles.push({x:tank.x+Math.cos(tank.turretAngle)*tank.turretLength,y:tank.y+Math.sin(tank.turretAngle)*tank.turretLength,vx:Math.cos(tank.turretAngle)*SHOT_SPEED,vy:Math.sin(tank.turretAngle)*SHOT_SPEED,radius:4,color:tank.color,owner:tank===tankA?'A':'B'});sound('fire')}
-    function explode(x,y,color,count=22){for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,s=110+Math.random()*220,life=.55+Math.random()*.35;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life,maxLife:life,size:2+Math.random()*4,color})}}
-    function collision(c,r){const x=clamp(c.x,r.x-r.width/2,r.x+r.width/2),y=clamp(c.y,r.y-r.height/2,r.y+r.height/2),dx=c.x-x,dy=c.y-y;return dx*dx+dy*dy<=c.radius*c.radius}
-
-    function updatePlayer(dt){let dx=0,dy=0;if(keys.has('arrowup')||keys.has('w'))dy--;if(keys.has('arrowdown')||keys.has('s'))dy++;if(keys.has('arrowleft')||keys.has('a'))dx--;if(keys.has('arrowright')||keys.has('d'))dx++;if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}tankA.vx=dx*tankA.speed;tankA.vy=dy*tankA.speed;tankA.x+=tankA.vx*dt;tankA.y+=tankA.vy*dt;tankA.x=clamp(tankA.x,tankA.width/2,CX-DIVIDER/2-tankA.width/2);tankA.y=clamp(tankA.y,tankA.height/2,H-tankA.height/2);tankA.turretAngle=Math.atan2(mouseY-tankA.y,mouseX-tankA.x);tankA.fireCooldown=Math.max(0,tankA.fireCooldown-dt)}
-    function threat(config){let best=null;for(const p of projectiles){if(p.owner!=='A'||p.vx<=0)continue;const t=(tankB.x-tankB.width/2-p.x)/p.vx;if(t<=0||t>config.horizon)continue;const projectedY=p.y+p.vy*t,miss=Math.abs(projectedY-tankB.y),danger=tankB.height/2+p.radius+38;if(miss<=danger&&(!best||t<best.time))best={time:t,projectedY}}return best}
-    function chooseMove(config){const t=threat(config);if(t){const up=tankB.y-tankB.height/2,down=H-(tankB.y+tankB.height/2);let dir=t.projectedY>=tankB.y?-1:1;if(dir<0&&up<65)dir=1;if(dir>0&&down<65)dir=-1;tankB.dodgeDirection=dir;tankB.wanderTimer=0}else{tankB.wanderTimer-=config.react;if(tankB.wanderTimer<=0||(tankB.y<=tankB.height/2+10&&tankB.dodgeDirection<0)||(tankB.y>=H-tankB.height/2-10&&tankB.dodgeDirection>0)){tankB.dodgeDirection=Math.random()<.5?-1:1;tankB.wanderTimer=.55+Math.random()*.85}}}
-    function updateAi(dt){const c=DIFF[state.difficulty];tankB.decisionCooldown-=dt;if(tankB.decisionCooldown<=0){chooseMove(c);tankB.decisionCooldown=c.react;tankB.aimError=(Math.random()*2-1)*c.wobble}tankB.vy=tankB.dodgeDirection*tankB.speed;tankB.y=clamp(tankB.y+tankB.vy*dt,tankB.height/2,H-tankB.height/2);tankB.x=clamp(tankB.x,CX+DIVIDER/2+tankB.width/2,W-tankB.width/2);const distance=Math.max(1,tankB.x-tankA.x),travel=distance/SHOT_SPEED,lead=travel*c.lead,targetX=tankA.x+tankA.vx*lead,targetY=tankA.y+tankA.vy*lead+tankB.aimError;tankB.turretAngle=Math.atan2(targetY-tankB.y,targetX-tankB.x);tankB.fireCooldown=Math.max(0,tankB.fireCooldown-dt);if(tankB.fireCooldown<=0){const desired=Math.atan2(tankA.y-tankB.y,tankA.x-tankB.x),delta=Math.abs(Math.atan2(Math.sin(tankB.turretAngle-desired),Math.cos(tankB.turretAngle-desired)));if(delta<=c.aimTolerance){fire(tankB);tankB.fireCooldown=tankB.fireInterval}}}
-    function updateShots(dt){for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20)projectiles.splice(i,1)}}
-    function checkHits(){for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];let hit=null;if(p.owner==='B'&&collision(p,tankA))hit=tankA;if(p.owner==='A'&&collision(p,tankB))hit=tankB;if(!hit)continue;projectiles.splice(i,1);hit.hp=Math.max(0,hit.hp-1);explode(hit.x,hit.y,hit.color,16);sound('hit');hud();if(hit.hp<=0){finishRound(hit===tankA?'B':'A');return}}}
-    function finishRound(winner){if(!state.roundActive)return;state.roundActive=false;projectiles=[];if(winner==='A'){state.scoreA++;explode(tankB.x,tankB.y,tankB.color,40)}else{state.scoreB++;explode(tankA.x,tankA.y,tankA.color,40)}sound('explosion');hud();if(state.scoreA>=WINS||state.scoreB>=WINS){state.matchOver=true;document.getElementById('gameOverText').textContent=state.scoreA>state.scoreB?'YOU WIN THE MATCH':'AI WINS THE MATCH';document.getElementById('gameOverScore').textContent=`Final score: ${state.scoreA} — ${state.scoreB}`;gameOverOverlay.classList.add('show');sound('gameover');return}document.getElementById('roundResult').textContent=winner==='A'?`ROUND ${state.round}: YOU WIN`:`ROUND ${state.round}: AI WINS`;document.getElementById('roundSummary').textContent=`Match score: ${state.scoreA} — ${state.scoreB}`;roundOverlay.classList.add('show')}
-    function nextRound(){if(state.matchOver||state.roundActive||!state.started)return;state.round++;roundOverlay.classList.remove('show');resetRound();state.lastTime=performance.now()}
-    function updateParticles(dt){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=360*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}}
-
-    function drawTank(t){ctx.save();ctx.fillStyle=t.color;ctx.shadowColor=t.color;ctx.shadowBlur=14;ctx.fillRect(t.x-t.width/2,t.y-t.height/2,t.width,t.height);ctx.shadowBlur=0;ctx.fillStyle='#333';ctx.fillRect(t.x-t.width/2,t.y-t.height/2-5,t.width,3);ctx.fillRect(t.x-t.width/2,t.y+t.height/2+2,t.width,3);ctx.strokeStyle=t.color;ctx.lineWidth=5;ctx.lineCap='round';ctx.shadowColor=t.color;ctx.shadowBlur=16;ctx.beginPath();ctx.moveTo(t.x,t.y);ctx.lineTo(t.x+Math.cos(t.turretAngle)*t.turretLength,t.y+Math.sin(t.turretAngle)*t.turretLength);ctx.stroke();ctx.restore()}
-    function render(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);drawTank(tankA);drawTank(tankB);ctx.save();for(const p of projectiles){ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);ctx.fill()}for(const p of particles){ctx.globalAlpha=clamp(p.life/p.maxLife,0,1);ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=9;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}ctx.restore()}
-    function loop(now){let dt=(now-state.lastTime)/1000;state.lastTime=now;dt=Math.min(dt,.05);if(state.started&&!state.paused&&state.roundActive&&!state.matchOver){updatePlayer(dt);updateAi(dt);updateShots(dt);checkHits()}if(!state.paused)updateParticles(dt);hud();render();requestAnimationFrame(loop)}
-
-    document.querySelectorAll('.difficulty-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();startGame(b.dataset.difficulty)}));
-    canvas.addEventListener('pointermove',mouseFrom);canvas.addEventListener('pointerdown',e=>{mouseFrom(e);if(e.button!==0||!state.started||state.paused||!state.roundActive||state.matchOver)return;if(tankA.fireCooldown<=0){fire(tankA);tankA.fireCooldown=tankA.fireInterval}});
-    window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d','p',' '].includes(k))e.preventDefault();keys.add(k);if(k==='p'&&!e.repeat)pause();if(k===' '&&!e.repeat)nextRound()});
-    window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();if(state.started&&state.roundActive&&!state.matchOver&&!state.paused)pause()});
-    document.getElementById('continueButton').addEventListener('click',nextRound);document.getElementById('restartButton').addEventListener('click',()=>location.reload());
-    buildHealth();hud();requestAnimationFrame(loop);
-  })();
-  </script>
+  <script src="game.js" defer></script>
 </body>
 </html>
