@@ -39,20 +39,21 @@
       </section>
     </header>
 
-    <section class="state-panel" id="statePanel" aria-live="polite">
+    <section class="state-panel setup" id="statePanel" aria-live="polite">
       <div class="state-copy">
+        <div class="start-kicker" id="startKicker">ACTION REQUIRED</div>
         <h1 id="stateTitle">SELECT A DIFFICULTY TO START</h1>
-        <p id="stateMessage"><strong>The match will not begin until you choose Easy, Medium, or Hard below.</strong> Destroy the opposing tank while evading its fire. Each tank has 3 HP; first to win 3 rounds takes the best-of-five match.</p>
+        <p id="stateMessage"><strong>The match is waiting for you.</strong> Choose Easy, Medium, or Hard below. Each tank has 3 HP; first to win 3 rounds takes the best-of-five match.</p>
       </div>
       <div class="state-actions" id="stateActions" aria-label="Choose difficulty to start">
         <button class="action-btn difficulty-btn" data-difficulty="easy">
-          START — EASY<span>Late reactions · slower movement/fire</span>
+          START — EASY<span>Later reactions · slower movement/fire</span>
         </button>
         <button class="action-btn difficulty-btn" data-difficulty="medium">
           START — MEDIUM<span>Balanced evasion and aim</span>
         </button>
         <button class="action-btn difficulty-btn" data-difficulty="hard">
-          START — HARD<span>Early threat reads · aggressive aim</span>
+          START — HARD<span>Earlier threat reads · aggressive aim</span>
         </button>
       </div>
     </section>
