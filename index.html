@@ -39,9 +39,9 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 50px;
+            gap: 80px;
             color: #00ff00;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             z-index: 100;
@@ -49,11 +49,24 @@
 
         .score-item {
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .score-label {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.7;
+        }
+
+        .match-score {
+            font-size: 20px;
+            color: #00ff00;
+        }
+
+        .round-label {
+            font-size: 11px;
+            color: #ffff00;
         }
 
         /* Middle ground (center divider) - 70% transparent */
@@ -65,8 +78,8 @@
             height: 100%;
             background: repeating-linear-gradient(
                 to bottom,
-                rgba(0, 255, 0, 0.3) 0px,
-                rgba(0, 255, 0, 0.3) 20px,
+                rgba(255, 165, 0, 0.3) 0px,
+                rgba(255, 165, 0, 0.3) 20px,
                 transparent 20px,
                 transparent 40px
             );
@@ -89,13 +102,28 @@
             bottom: 20px;
             left: 20px;
             color: #00ff00;
-            font-size: 12px;
+            font-size: 11px;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             z-index: 100;
         }
 
         .hud-line {
-            margin: 5px 0;
+            margin: 4px 0;
+        }
+
+        .hp-bar {
+            display: inline-block;
+            width: 60px;
+            height: 8px;
+            background: #222;
+            border: 1px solid #00ff00;
+            margin-left: 5px;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background: #00ff00;
+            width: 100%;
         }
 
         /* Game over overlay */
@@ -105,7 +133,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
@@ -147,21 +175,94 @@
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
         }
 
+        /* Difficulty selector */
+        .difficulty-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 1000;
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        .difficulty-overlay.hidden {
+            display: none;
+        }
+
+        .difficulty-title {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #00ff00;
+            color: #0a0e27;
+            border: 2px solid #00ff00;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            background: #00cc00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Pause overlay */
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        .pause-overlay.show {
+            display: flex;
+        }
+
+        .pause-text {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
         /* Instructions */
         .instructions {
             position: absolute;
             top: 80px;
             right: 20px;
             color: #00ff00;
-            font-size: 12px;
+            font-size: 11px;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             z-index: 100;
             text-align: right;
-            max-width: 250px;
+            max-width: 200px;
         }
 
         .instruction-line {
-            margin: 5px 0;
+            margin: 4px 0;
         }
     </style>
 </head>
@@ -169,31 +270,47 @@
     <div class="game-container">
         <canvas id="gameCanvas"></canvas>
         
+        <div class="difficulty-overlay" id="difficultyOverlay">
+            <div class="difficulty-title">SELECT DIFFICULTY</div>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" onclick="startGame('easy')">EASY</button>
+                <button class="difficulty-btn" onclick="startGame('medium')">MEDIUM</button>
+                <button class="difficulty-btn" onclick="startGame('hard')">HARD</button>
+            </div>
+        </div>
+
         <div class="scoreboard">
             <div class="score-item">
                 <div class="score-label">TANK A</div>
-                <div id="scoreA">0</div>
+                <div class="match-score"><span id="scoreA">0</span> - <span id="scoreB">0</span></div>
+                <div class="round-label">Match</div>
             </div>
             <div class="score-item">
-                <div class="score-label">TANK B</div>
-                <div id="scoreB">0</div>
+                <div class="score-label">ROUND <span id="roundNumber">1</span></div>
+                <div class="round-label">BEST OF 3</div>
             </div>
         </div>
 
         <div class="middle-ground"></div>
 
         <div class="hud">
-            <div class="hud-line">TANK A STATUS:</div>
-            <div class="hud-line">Position: <span id="posA">0, 0</span></div>
-            <div class="hud-line">Ammo: <span id="ammoA">∞</span></div>
+            <div class="hud-line">TANK A (YOU)</div>
+            <div class="hud-line">HP: <span class="hp-bar"><span class="hp-fill" id="hpFillA"></span></span></div>
+            <div class="hud-line">Fire Rate: <span id="fireRateA">Ready</span></div>
+            <div class="hud-line">Pos: <span id="posA">0, 0</span></div>
         </div>
 
         <div class="instructions">
             <div class="instruction-line"><strong>CONTROLS:</strong></div>
-            <div class="instruction-line">↑↓←→ or WASD - Move Tank</div>
-            <div class="instruction-line">Mouse - Aim Turret</div>
+            <div class="instruction-line">↑↓←→ or WASD - Move</div>
+            <div class="instruction-line">Mouse - Aim</div>
             <div class="instruction-line">Left Click - Fire</div>
-            <div class="instruction-line">Space - Reset Game</div>
+            <div class="instruction-line">P - Pause</div>
+            <div class="instruction-line">SPACE - Next Round</div>
+        </div>
+
+        <div class="pause-overlay" id="pauseOverlay">
+            <div class="pause-text">PAUSED</div>
         </div>
 
         <div class="game-over-overlay" id="gameOverOverlay">
@@ -204,6 +321,42 @@
     </div>
 
     <script>
+        // Simple audio synthesis for sound effects
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            if (type === 'fire') {
+                oscillator.frequency.value = 800;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } else if (type === 'hit') {
+                oscillator.frequency.value = 400;
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } else if (type === 'explosion') {
+                oscillator.frequency.value = 200;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else if (type === 'gameover') {
+                oscillator.frequency.value = 300;
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1);
+            }
+        }
+
         // Canvas setup
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -216,9 +369,19 @@
         const CENTER_X = GAME_WIDTH / 2;
         const CENTER_Y = GAME_HEIGHT / 2;
         const MIDDLE_GROUND_WIDTH = 8;
-        const WINNING_SCORE = 5;
+        const MAX_MATCH_SCORE = 3;
 
-        // Tank A (Player)
+        // Game state
+        let gameActive = true;
+        let gamePaused = false;
+        let difficulty = 'medium';
+        let matchScoreA = 0;
+        let matchScoreB = 0;
+        let roundNumber = 1;
+        let roundActive = true;
+        let explosionActive = false;
+
+        // Tank A (Player) - Green
         const tankA = {
             x: 100,
             y: CENTER_Y,
@@ -229,10 +392,14 @@
             turretAngle: 0,
             turretLength: 25,
             vx: 0,
-            vy: 0
+            vy: 0,
+            hp: 3,
+            maxHp: 3,
+            fireRate: 15,
+            fireCooldown: 0
         };
 
-        // Tank B (AI)
+        // Tank B (AI) - Red
         const tankB = {
             x: GAME_WIDTH - 100,
             y: CENTER_Y,
@@ -244,17 +411,17 @@
             turretLength: 25,
             vx: 0,
             vy: 0,
+            hp: 3,
+            maxHp: 3,
+            fireRate: 20,
+            fireCooldown: 0,
             targetY: CENTER_Y,
-            shootCooldown: 0
+            dodgeTimer: 0
         };
 
         // Projectiles
         let projectiles = [];
-
-        // Score
-        let scoreA = 0;
-        let scoreB = 0;
-        let gameActive = true;
+        let particles = [];
 
         // Input handling
         const keys = {};
@@ -263,10 +430,17 @@
 
         window.addEventListener('keydown', (e) => {
             keys[e.key.toLowerCase()] = true;
+            if (e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+                if (gameActive && roundActive) {
+                    gamePaused = !gamePaused;
+                    document.getElementById('pauseOverlay').classList.toggle('show');
+                }
+            }
             if (e.key === ' ') {
                 e.preventDefault();
-                if (!gameActive) {
-                    location.reload();
+                if (!roundActive && gameActive) {
+                    startNewRound();
                 }
             }
         });
@@ -282,23 +456,55 @@
         });
 
         window.addEventListener('click', () => {
-            if (!gameActive) return;
-            fireProjectile(tankA);
+            if (!gameActive || !roundActive || gamePaused) return;
+            if (tankA.fireCooldown <= 0) {
+                fireProjectile(tankA);
+                tankA.fireCooldown = tankA.fireRate;
+                playSound('fire');
+            }
         });
+
+        function startGame(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            
+            // Adjust AI stats based on difficulty
+            if (difficulty === 'easy') {
+                tankB.speed = 2;
+                tankB.fireRate = 40;
+            } else if (difficulty === 'medium') {
+                tankB.speed = 3;
+                tankB.fireRate = 25;
+            } else if (difficulty === 'hard') {
+                tankB.speed = 4;
+                tankB.fireRate = 15;
+            }
+            
+            document.getElementById('difficultyOverlay').classList.add('hidden');
+            gameActive = true;
+        }
 
         // Draw tank
         function drawTank(tank) {
             // Tank body
             ctx.fillStyle = tank.color;
             ctx.shadowColor = tank.color;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 15;
             
             ctx.fillRect(tank.x - tank.width / 2, tank.y - tank.height / 2, tank.width, tank.height);
 
-            // Tank treads (visual detail)
+            // Tank treads
             ctx.fillStyle = '#333333';
             ctx.fillRect(tank.x - tank.width / 2, tank.y - tank.height / 2 - 5, tank.width, 3);
             ctx.fillRect(tank.x - tank.width / 2, tank.y + tank.height / 2 + 2, tank.width, 3);
+
+            // HP indicator
+            const hpBarWidth = tank.width;
+            const hpPercent = tank.hp / tank.maxHp;
+            ctx.fillStyle = hpPercent > 0.5 ? '#00ff00' : hpPercent > 0.25 ? '#ffff00' : '#ff0000';
+            ctx.fillRect(tank.x - hpBarWidth / 2, tank.y - tank.height / 2 - 10, hpBarWidth * hpPercent, 3);
+            ctx.strokeStyle = tank.color;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tank.x - hpBarWidth / 2, tank.y - tank.height / 2 - 10, hpBarWidth, 3);
 
             // Turret
             const turretStartX = tank.x;
@@ -310,7 +516,7 @@
             ctx.lineWidth = 5;
             ctx.lineCap = 'round';
             ctx.shadowColor = tank.color;
-            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 20;
             ctx.beginPath();
             ctx.moveTo(turretStartX, turretStartY);
             ctx.lineTo(turretEndX, turretEndY);
@@ -346,7 +552,6 @@
                 proj.x += proj.vx;
                 proj.y += proj.vy;
 
-                // Remove projectiles outside bounds
                 if (proj.x < 0 || proj.x > GAME_WIDTH || proj.y < 0 || proj.y > GAME_HEIGHT) {
                     projectiles.splice(index, 1);
                 }
@@ -355,7 +560,48 @@
             });
         }
 
-        // Collision detection - Circle vs Rectangle
+        // Create explosion particles
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                const angle = (Math.random() * Math.PI * 2);
+                const speed = Math.random() * 5 + 3;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    color: color,
+                    size: Math.random() * 3 + 2
+                });
+            }
+        }
+
+        // Draw particles
+        function drawParticles() {
+            particles.forEach((p, index) => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // gravity
+                p.life -= 0.02;
+
+                if (p.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+
+        // Collision detection
         function circleRectCollision(circle, rect) {
             const closestX = Math.max(rect.x - rect.width / 2, Math.min(circle.x, rect.x + rect.width / 2));
             const closestY = Math.max(rect.y - rect.height / 2, Math.min(circle.y, rect.y + rect.height / 2));
@@ -370,28 +616,24 @@
         // Check collisions
         function checkCollisions() {
             projectiles.forEach((proj, projIndex) => {
-                // Collision with Tank A
                 if (proj.owner === 'B' && circleRectCollision(proj, tankA)) {
                     projectiles.splice(projIndex, 1);
-                    scoreB++;
-                    updateScore();
-                    if (scoreB >= WINNING_SCORE) {
-                        endGame('Tank B Wins!');
-                    } else {
-                        resetPositions();
+                    tankA.hp--;
+                    playSound('hit');
+                    createExplosion(tankA.x, tankA.y, '#00ff00');
+                    if (tankA.hp <= 0) {
+                        endRound('B');
                     }
                     return;
                 }
 
-                // Collision with Tank B
                 if (proj.owner === 'A' && circleRectCollision(proj, tankB)) {
                     projectiles.splice(projIndex, 1);
-                    scoreA++;
-                    updateScore();
-                    if (scoreA >= WINNING_SCORE) {
-                        endGame('Tank A Wins!');
-                    } else {
-                        resetPositions();
+                    tankB.hp--;
+                    playSound('hit');
+                    createExplosion(tankB.x, tankB.y, '#ff0000');
+                    if (tankB.hp <= 0) {
+                        endRound('A');
                     }
                     return;
                 }
@@ -400,7 +642,6 @@
 
         // Update Tank A (Player)
         function updateTankA() {
-            // Movement
             tankA.vx = 0;
             tankA.vy = 0;
 
@@ -412,26 +653,29 @@
             tankA.x += tankA.vx;
             tankA.y += tankA.vy;
 
-            // Boundary constraints
             tankA.x = Math.max(tankA.width / 2, Math.min(tankA.x, CENTER_X - MIDDLE_GROUND_WIDTH / 2 - tankA.width / 2));
             tankA.y = Math.max(tankA.height / 2, Math.min(tankA.y, GAME_HEIGHT - tankA.height / 2));
 
-            // Turret aiming
             const dx = mouseX - tankA.x;
             const dy = mouseY - tankA.y;
             tankA.turretAngle = Math.atan2(dy, dx);
 
-            // Update HUD
+            tankA.fireCooldown--;
             document.getElementById('posA').textContent = `${Math.round(tankA.x)}, ${Math.round(tankA.y)}`;
+            document.getElementById('fireRateA').textContent = tankA.fireCooldown > 0 ? `${tankA.fireCooldown}` : 'Ready';
+            document.getElementById('hpFillA').style.width = (tankA.hp / tankA.maxHp * 100) + '%';
         }
 
         // Update Tank B (AI)
         function updateTankB() {
-            // AI behavior
-            tankB.targetY += (Math.random() - 0.5) * 3;
-            tankB.targetY = Math.max(tankB.height / 2, Math.min(tankB.targetY, GAME_HEIGHT - tankB.height / 2));
+            // AI movement
+            tankB.dodgeTimer--;
+            if (tankB.dodgeTimer <= 0) {
+                tankB.targetY += (Math.random() - 0.5) * 5;
+                tankB.targetY = Math.max(tankB.height / 2, Math.min(tankB.targetY, GAME_HEIGHT - tankB.height / 2));
+                tankB.dodgeTimer = 30;
+            }
 
-            // Move towards target
             const diff = tankB.targetY - tankB.y;
             if (Math.abs(diff) > 5) {
                 tankB.vy = diff > 0 ? tankB.speed : -tankB.speed;
@@ -440,37 +684,78 @@
             }
 
             tankB.y += tankB.vy;
-
-            // Keep Tank B on right side
             tankB.x = Math.max(CENTER_X + MIDDLE_GROUND_WIDTH / 2 + tankB.width / 2, Math.min(tankB.x, GAME_WIDTH - tankB.width / 2));
             tankB.y = Math.max(tankB.height / 2, Math.min(tankB.y, GAME_HEIGHT - tankB.height / 2));
 
-            // AI Turret aiming - aim at Tank A with some prediction
+            // AI aiming with prediction
+            let predictedY = tankA.y;
+            if (difficulty === 'hard') {
+                predictedY = tankA.y + tankA.vy * 15;
+            } else if (difficulty === 'medium') {
+                predictedY = tankA.y + tankA.vy * 5;
+            }
+
             const dx = tankA.x - tankB.x;
-            const dy = (tankA.y + tankA.vy * 10) - tankB.y;
+            const dy = predictedY - tankB.y;
             tankB.turretAngle = Math.atan2(dy, dx);
 
             // AI shooting
-            tankB.shootCooldown--;
-            if (tankB.shootCooldown <= 0 && Math.random() > 0.95) {
+            tankB.fireCooldown--;
+            const fireChance = difficulty === 'hard' ? 0.92 : difficulty === 'medium' ? 0.94 : 0.96;
+            if (tankB.fireCooldown <= 0 && Math.random() > fireChance) {
                 fireProjectile(tankB);
-                tankB.shootCooldown = 30;
+                tankB.fireCooldown = tankB.fireRate;
+                playSound('fire');
             }
         }
 
-        // Update score display
-        function updateScore() {
-            document.getElementById('scoreA').textContent = scoreA;
-            document.getElementById('scoreB').textContent = scoreB;
+        // End round
+        function endRound(winner) {
+            roundActive = false;
+            explosionActive = true;
+
+            if (winner === 'A') {
+                matchScoreA++;
+                createExplosion(tankB.x, tankB.y, '#ff6600');
+                playSound('explosion');
+            } else {
+                matchScoreB++;
+                createExplosion(tankA.x, tankA.y, '#00ff00');
+                playSound('explosion');
+            }
+
+            document.getElementById('scoreA').textContent = matchScoreA;
+            document.getElementById('scoreB').textContent = matchScoreB;
+
+            if (matchScoreA >= MAX_MATCH_SCORE) {
+                setTimeout(() => endGame('Tank A WINS!'), 1000);
+            } else if (matchScoreB >= MAX_MATCH_SCORE) {
+                setTimeout(() => endGame('Tank B WINS!'), 1000);
+            }
         }
 
-        // Reset positions after hit
-        function resetPositions() {
+        // Start new round
+        function startNewRound() {
+            if (matchScoreA >= MAX_MATCH_SCORE || matchScoreB >= MAX_MATCH_SCORE) return;
+
+            roundNumber++;
+            document.getElementById('roundNumber').textContent = roundNumber;
+
             tankA.x = 100;
             tankA.y = CENTER_Y;
+            tankA.hp = tankA.maxHp;
+            tankA.fireCooldown = 0;
+
             tankB.x = GAME_WIDTH - 100;
             tankB.y = CENTER_Y;
+            tankB.hp = tankB.maxHp;
+            tankB.fireCooldown = 0;
+            tankB.targetY = CENTER_Y;
+
             projectiles = [];
+            particles = [];
+            explosionActive = false;
+            roundActive = true;
         }
 
         // End game
@@ -478,32 +763,33 @@
             gameActive = false;
             const overlay = document.getElementById('gameOverOverlay');
             document.getElementById('gameOverText').textContent = message;
-            document.getElementById('gameOverScore').textContent = `${scoreA} : ${scoreB}`;
+            document.getElementById('gameOverScore').textContent = `${matchScoreA} - ${matchScoreB}`;
             overlay.classList.add('show');
+            playSound('gameover');
         }
 
         // Main game loop
         function gameLoop() {
-            // Clear canvas
             ctx.fillStyle = '#0a0e27';
             ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-            if (gameActive) {
+            if (gameActive && roundActive && !gamePaused) {
                 updateTankA();
                 updateTankB();
                 checkCollisions();
             }
 
-            // Draw everything
-            drawTank(tankA);
-            drawTank(tankB);
-            drawProjectiles();
+            if (gameActive) {
+                drawTank(tankA);
+                drawTank(tankB);
+                drawProjectiles();
+                drawParticles();
+            }
 
             requestAnimationFrame(gameLoop);
         }
 
-        // Start game
-        updateScore();
+        // Start
         gameLoop();
     </script>
 </body>
