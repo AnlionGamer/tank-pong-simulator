@@ -9,7 +9,7 @@
   const CY = H / 2;
   const DIVIDER = 8;
   const HP = 3;
-  const WINS = 2;
+  const WINS = 3;
   const SHOT_SPEED = 420;
 
   const difficultyOverlay = document.getElementById('difficultyOverlay');
