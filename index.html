@@ -2,102 +2,203 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Tank Pong Simulator — a reverse-Pong tank duel focused on aiming, evasion, and survival.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Tank Pong Simulator — a reverse-Pong tank duel for desktop and mobile.">
   <title>Tank Pong Simulator</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="countdown.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar" aria-label="Match status">
-      <section class="tank-status player-status" aria-label="Player status">
-        <div class="tank-heading">
-          <span class="tank-name player">YOU</span>
-          <span class="effect-readout" id="effectA">No power-up</span>
+  <main class="app-shell">
+    <section class="screen menu-screen active" id="mainMenuScreen" aria-labelledby="mainTitle">
+      <div class="menu-card hero-card">
+        <p class="eyebrow">REVERSE-PONG TANK DUEL</p>
+        <h1 id="mainTitle">TANK PONG</h1>
+        <p class="menu-subtitle">Destroy the opposing tank while staying alive. Three hits destroy a tank; first to three round wins takes the match.</p>
+        <div class="menu-stack primary-menu">
+          <button class="menu-btn primary" id="singlePlayerButton">SINGLE PLAYER</button>
+          <button class="menu-btn" id="multiplayerButton">MULTIPLAYER</button>
+          <button class="menu-btn" id="optionsButton">OPTIONS</button>
+          <button class="menu-btn" id="howToPlayButton">HOW TO PLAY</button>
         </div>
-        <div class="health-row">
-          <strong>HP</strong>
-          <div class="hp-bar" id="hpA" aria-label="Player health"></div>
-        </div>
-      </section>
-
-      <section class="match-panel" aria-label="Match score">
-        <div class="score"><span id="scoreA">0</span> — <span id="scoreB">0</span></div>
-        <div class="round">ROUND <span id="roundNumber">1</span> · BEST OF 5</div>
-        <div class="difficulty-label" id="difficultyLabel">Difficulty: not selected</div>
-      </section>
-
-      <section class="tank-status ai-status" aria-label="AI status">
-        <div class="tank-heading ai-heading">
-          <span class="effect-readout" id="effectB">No power-up</span>
-          <span class="tank-name ai">AI</span>
-        </div>
-        <div class="health-row ai-health-row">
-          <div class="hp-bar" id="hpB" aria-label="AI health"></div>
-          <strong>HP</strong>
-        </div>
-      </section>
-    </header>
-
-    <section class="state-panel setup" id="statePanel" aria-live="polite">
-      <div class="state-copy">
-        <div class="start-kicker" id="startKicker">ACTION REQUIRED</div>
-        <h1 id="stateTitle">SELECT A DIFFICULTY TO START</h1>
-        <p id="stateMessage"><strong>The match is waiting for you.</strong> Choose Easy, Medium, or Hard below. Each tank has 3 HP; first to win 3 rounds takes the best-of-five match.</p>
-      </div>
-      <div class="state-actions" id="stateActions" aria-label="Choose difficulty to start">
-        <button class="action-btn difficulty-btn" data-difficulty="easy">
-          START — EASY<span>Later reactions · slower movement/fire</span>
-        </button>
-        <button class="action-btn difficulty-btn" data-difficulty="medium">
-          START — MEDIUM<span>Balanced evasion and aim</span>
-        </button>
-        <button class="action-btn difficulty-btn" data-difficulty="hard">
-          START — HARD<span>Earlier threat reads · aggressive aim</span>
-        </button>
       </div>
     </section>
 
-    <section class="arena-wrap" id="arenaWrap" aria-label="Tank Pong play field">
-      <canvas id="gameCanvas" width="1200" height="600" aria-label="Tank Pong battlefield"></canvas>
-      <div class="divider" aria-hidden="true"></div>
+    <section class="screen menu-screen" id="singlePlayerScreen" aria-labelledby="singleTitle">
+      <div class="menu-card">
+        <button class="back-btn" data-back="main">← MAIN MENU</button>
+        <p class="eyebrow">SINGLE PLAYER</p>
+        <h1 id="singleTitle">CHOOSE DIFFICULTY</h1>
+        <p class="menu-subtitle">Selecting a difficulty starts Round 1. The arena appears first, then the 3–2–1–GO countdown begins over it.</p>
+        <div class="difficulty-grid">
+          <button class="difficulty-card difficulty-btn" data-difficulty="easy">
+            <strong>EASY</strong>
+            <span>Later reactions, slower movement and firing, more dodge mistakes.</span>
+          </button>
+          <button class="difficulty-card difficulty-btn" data-difficulty="medium">
+            <strong>MEDIUM</strong>
+            <span>Balanced evasion, movement, aim, and firing cadence.</span>
+          </button>
+          <button class="difficulty-card difficulty-btn" data-difficulty="hard">
+            <strong>HARD</strong>
+            <span>Earlier threat reads, faster movement, aggressive and accurate fire.</span>
+          </button>
+        </div>
+      </div>
     </section>
 
-    <section class="hud" aria-label="Game information and controls">
-      <div class="hud-block combat-status">
-        <h2>COMBAT STATUS</h2>
-        <div class="hud-grid">
-          <span>Ammo</span><strong>Unlimited</strong>
-          <span>Your fire</span><strong id="fireStatus">Ready</strong>
-          <span>Position</span><strong id="playerPosition">100, 300</strong>
-          <span>Round state</span><strong id="roundState">Select difficulty to start</strong>
+    <section class="screen menu-screen" id="multiplayerScreen" aria-labelledby="multiplayerTitle">
+      <div class="menu-card">
+        <button class="back-btn" data-back="main">← MAIN MENU</button>
+        <p class="eyebrow">MULTIPLAYER</p>
+        <h1 id="multiplayerTitle">PRIVATE BATTLES</h1>
+        <p class="menu-subtitle">Networking is the next development stage. PC rooms will pair only with PC players; phone rooms will pair only with phone players.</p>
+        <div class="menu-stack">
+          <button class="menu-btn" disabled>CREATE MATCH — COMING NEXT</button>
+          <button class="menu-btn" disabled>JOIN MATCH — COMING NEXT</button>
+        </div>
+        <div class="info-panel">
+          <strong>Planned multiplayer rules</strong>
+          <p>Best of five, three HP per round, the same power-ups, no pausing, and private room codes. Personal color settings remain local to each device.</p>
         </div>
       </div>
+    </section>
 
-      <div class="hud-block powerup-info">
-        <h2>POWER-UPS</h2>
-        <div class="powerup-legend">
-          <span class="legend-item speed"><i></i><strong>Speed</strong> +35% movement for 6s</span>
-          <span class="legend-item rapid"><i></i><strong>Rapid Fire</strong> 45% shorter cooldown for 6s</span>
-          <span class="legend-item shield"><i></i><strong>Shield</strong> blocks the next hit</span>
-        </div>
-      </div>
+    <section class="screen menu-screen" id="optionsScreen" aria-labelledby="optionsTitle">
+      <div class="menu-card wide-card">
+        <button class="back-btn" id="optionsBackButton">← BACK</button>
+        <p class="eyebrow">LOCAL SETTINGS</p>
+        <h1 id="optionsTitle">OPTIONS</h1>
+        <p class="menu-subtitle">These appearance and sound settings are saved only on this device. In multiplayer, they will not change what the other player sees.</p>
 
-      <div class="hud-block controls">
-        <h2>CONTROLS</h2>
-        <p><strong>WASD / Arrows</strong> move · <strong>Mouse</strong> aims · <strong>Left Click</strong> fires · <strong>P</strong> pauses</p>
-        <div class="control-buttons">
-          <button class="small-btn" id="pauseButton" disabled>PAUSE</button>
-          <button class="small-btn" id="soundButton">SOUND: ON</button>
-          <button class="small-btn primary" id="continueButton" hidden>NEXT ROUND</button>
-          <button class="small-btn primary" id="restartButton" hidden>PLAY AGAIN</button>
+        <div class="options-grid">
+          <section class="option-group">
+            <h2>YOUR TANK COLOR</h2>
+            <div class="palette" id="playerPalette" aria-label="Your tank color"></div>
+          </section>
+          <section class="option-group">
+            <h2>OPPONENT TANK COLOR</h2>
+            <div class="palette" id="opponentPalette" aria-label="Opponent tank color"></div>
+          </section>
+          <section class="option-group">
+            <h2>ARENA BORDER / CENTER LINE</h2>
+            <div class="palette" id="arenaPalette" aria-label="Arena color"></div>
+          </section>
+
+          <section class="option-group compact-options">
+            <label class="toggle-row">
+              <span><strong>Sound Effects</strong><small>Firing, impacts, power-ups and explosions.</small></span>
+              <input type="checkbox" id="soundToggle" checked>
+            </label>
+            <label>
+              <span class="option-label">Sound Volume <output id="volumeValue">65%</output></span>
+              <input type="range" id="volumeRange" min="0" max="100" value="65">
+            </label>
+            <label>
+              <span class="option-label">Effects Quality</span>
+              <select id="effectsSelect">
+                <option value="full">Full</option>
+                <option value="reduced">Reduced</option>
+              </select>
+            </label>
+            <label>
+              <span class="option-label">HUD Size</span>
+              <select id="hudSizeSelect">
+                <option value="small">Small</option>
+                <option value="normal">Normal</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+            <button class="menu-btn compact" id="fullscreenButton">TOGGLE FULLSCREEN</button>
+          </section>
         </div>
+        <p class="option-notice" id="optionNotice" aria-live="polite"></p>
       </div>
+    </section>
+
+    <section class="screen menu-screen" id="howToPlayScreen" aria-labelledby="howTitle">
+      <div class="menu-card wide-card">
+        <button class="back-btn" data-back="main">← MAIN MENU</button>
+        <p class="eyebrow">QUICK GUIDE</p>
+        <h1 id="howTitle">HOW TO PLAY</h1>
+
+        <div class="guide-grid">
+          <section class="guide-card">
+            <h2>MATCH RULES</h2>
+            <ul>
+              <li>Each tank has <strong>3 HP</strong> per round.</li>
+              <li>Destroying the opposing tank wins <strong>one round</strong>.</li>
+              <li>First to <strong>3 round wins</strong> takes the best-of-five match.</li>
+              <li>Tanks cannot cross the center divider. Projectiles can.</li>
+              <li>Every round begins with an arena-overlay <strong>3 → 2 → 1 → GO</strong> countdown.</li>
+            </ul>
+          </section>
+
+          <section class="guide-card">
+            <h2>PC CONTROLS</h2>
+            <ul>
+              <li><strong>WASD / Arrow Keys:</strong> move.</li>
+              <li><strong>Mouse:</strong> aim the turret.</li>
+              <li><strong>Hold Left Mouse:</strong> fire whenever the cooldown is ready.</li>
+              <li><strong>P:</strong> pause single-player only.</li>
+            </ul>
+            <p class="guide-note">Phone build: left stick moves; the right aim stick fires automatically only while that stick is actively being used.</p>
+          </section>
+        </div>
+
+        <section class="powerup-guide" aria-labelledby="powerupTitle">
+          <h2 id="powerupTitle">POWER-UPS</h2>
+          <p>Power-ups do not add status text during combat. Learn the symbols here; in the arena they simply take effect when collected.</p>
+          <div class="powerup-cards">
+            <article class="power-card speed-card">
+              <div class="power-icon speed-icon" aria-hidden="true"><span></span><span></span></div>
+              <div><strong>SPEED</strong><p>Increases movement speed by 35% for 6 seconds.</p></div>
+            </article>
+            <article class="power-card rapid-card">
+              <div class="power-icon rapid-icon" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div><strong>RAPID FIRE</strong><p>Reduces the firing cooldown by 45% for 6 seconds.</p></div>
+            </article>
+            <article class="power-card shield-card">
+              <div class="power-icon shield-icon" aria-hidden="true"></div>
+              <div><strong>SHIELD</strong><p>Blocks the next incoming hit, then disappears.</p></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="screen match-screen" id="matchScreen" aria-label="Tank Pong match">
+      <header class="match-hud" id="matchHud">
+        <section class="match-side player-side">
+          <strong class="hud-name">YOU</strong>
+          <div class="hp-bar" id="hpA" aria-label="Your health"></div>
+        </section>
+        <section class="match-center">
+          <div class="score"><span id="scoreA">0</span><span class="score-sep">—</span><span id="scoreB">0</span></div>
+          <div class="round-line">ROUND <span id="roundNumber">1</span> / BEST OF 5</div>
+          <div class="difficulty-line" id="difficultyLabel">Medium</div>
+        </section>
+        <section class="match-side opponent-side">
+          <div class="hp-bar" id="hpB" aria-label="Opponent health"></div>
+          <strong class="hud-name">AI</strong>
+        </section>
+        <button class="pause-icon" id="pauseButton" aria-label="Pause single-player match" title="Pause (P)">Ⅱ</button>
+      </header>
+
+      <section class="arena-wrap" id="arenaWrap" aria-label="Tank Pong battlefield">
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        <div class="divider" aria-hidden="true"></div>
+        <div class="arena-overlay" id="arenaOverlay" hidden>
+          <div class="overlay-card" id="overlayCard">
+            <div class="overlay-kicker" id="overlayKicker"></div>
+            <div class="overlay-title" id="overlayTitle"></div>
+            <p class="overlay-message" id="overlayMessage"></p>
+            <div class="overlay-actions" id="overlayActions"></div>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
-  <script src="countdown.js" defer></script>
   <script src="game.js" defer></script>
 </body>
 </html>
