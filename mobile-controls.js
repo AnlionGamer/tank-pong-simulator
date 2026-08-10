@@ -1,6 +1,13 @@
 (() => {
   'use strict';
 
+  // Networking proof is loaded from this shared script so the current HTML
+  // does not need to diverge from the already-tested phone-controls build.
+  const lanScript = document.createElement('script');
+  lanScript.src = 'lan-multiplayer.js';
+  lanScript.async = false;
+  document.head.appendChild(lanScript);
+
   const isMobilePhone =
     navigator.userAgentData?.mobile === true ||
     /Android.+Mobile|iPhone|iPod/i.test(navigator.userAgent);
