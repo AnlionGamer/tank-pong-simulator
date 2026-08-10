@@ -4,12 +4,12 @@ A browser-based reverse-Pong tank duel. Each tank stays on its own half of the a
 
 ## Current game flow
 
-Opening the game now starts at a main menu instead of loading every control and statistic onto one page.
+Opening the game starts at a main menu instead of loading every control and statistic onto one page.
 
 - **Single Player** — choose Easy, Medium, or Hard.
 - **Multiplayer** — reserved for the upcoming private-room networking build.
 - **Options** — local appearance, sound, effects, HUD size, and fullscreen controls.
-- **How to Play** — rules, PC controls, and illustrated power-up explanations.
+- **How to Play** — rules, PC/phone controls, and illustrated power-up explanations.
 
 The match screen is intentionally minimal so the arena can use nearly the entire available display.
 
@@ -28,6 +28,17 @@ The match screen is intentionally minimal so the arena can use nearly the entire
 - **Mouse:** Aim turret.
 - **Hold Left Mouse:** Keep firing whenever the cooldown is ready.
 - **P:** Pause single-player only.
+
+## Phone controls — current test build
+
+Phone matches are designed for landscape orientation and use low-obstruction floating sticks that appear under the player's thumbs only while touched.
+
+- **Left thumb:** Touch and drag in the lower-left half of the arena to move.
+- **Right thumb:** Touch and drag in the lower-right half of the arena to aim.
+- **Right aim stick engaged:** The tank automatically fires whenever its normal cooldown is ready.
+- **Release the right aim stick:** Firing stops.
+- The controls are phone-only and are not displayed for normal PC mouse/keyboard play.
+- Portrait play shows a rotate-to-landscape prompt during a match.
 
 ## Difficulty
 
@@ -55,12 +66,10 @@ The following settings are saved in the browser using local storage and are inte
 - Small, normal, or large HUD.
 - Fullscreen toggle where supported.
 
-## Planned multiplayer/mobile direction
+## Planned multiplayer direction
 
 - PC multiplayer pairs only with PC players.
 - Phone multiplayer pairs only with phone players.
 - No PC-to-phone multiplayer.
 - Multiplayer has no pause function.
-- Phone controls use a left movement stick and a right aiming stick.
-- Phone firing is automatic **only while the right aiming stick is actively being used**.
-- Private room creation/joining and networking are the next major development stage.
+- Private room creation/joining and synchronized match networking are the next major development stage after the current two-phone control test.
