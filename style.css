@@ -25,8 +25,8 @@ button { touch-action: manipulation; }
 .screen { display: none; width: 100%; height: 100%; }
 .screen.active { display: flex; }
 
-.menu-screen { overflow: auto; align-items: center; justify-content: center; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); }
-.menu-card { width: min(760px, 100%); border: 1px solid color-mix(in srgb, var(--arena) 42%, transparent); background: linear-gradient(180deg, rgba(4,20,22,.97), rgba(0,7,8,.98)); padding: clamp(22px, 4vw, 40px); box-shadow: 0 0 34px color-mix(in srgb, var(--arena) 13%, transparent); }
+.menu-screen { overflow: auto; align-items: flex-start; justify-content: center; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); }
+.menu-card { width: min(760px, 100%); margin-block: auto; border: 1px solid color-mix(in srgb, var(--arena) 42%, transparent); background: linear-gradient(180deg, rgba(4,20,22,.97), rgba(0,7,8,.98)); padding: clamp(22px, 4vw, 40px); box-shadow: 0 0 34px color-mix(in srgb, var(--arena) 13%, transparent); }
 .menu-card.wide-card { width: min(1020px, 100%); }
 .hero-card { text-align: center; }
 .eyebrow { margin: 0 0 8px; color: var(--warning); font-size: 11px; font-weight: 900; letter-spacing: .18em; }
@@ -43,6 +43,8 @@ button { touch-action: manipulation; }
 .menu-btn:disabled { opacity: .38; cursor: not-allowed; }
 .back-btn { border: 0; background: transparent; padding: 0 0 22px; color: var(--muted); }
 .back-btn:hover { background: transparent; color: var(--arena); transform: none; }
+#optionsBackButton { position: sticky; top: 0; z-index: 5; width: max-content; padding: 8px 10px; margin: -8px 0 14px -10px; background: rgba(4,20,22,.96); border: 1px solid rgba(0,255,255,.20); }
+#optionsBackButton:hover { background: rgba(4,20,22,.96); }
 
 .difficulty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 26px; }
 .difficulty-card { padding: 22px 16px; text-align: left; min-height: 150px; }
