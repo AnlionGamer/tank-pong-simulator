@@ -1,0 +1,150 @@
+.mobile-control-layer,
+.mobile-orientation-hint {
+  display: none;
+}
+
+body.phone-controls {
+  overscroll-behavior: none;
+}
+
+body.phone-controls .mobile-control-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: block;
+  pointer-events: none;
+}
+
+body.phone-controls .touch-zone {
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 62%;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.phone-controls .move-zone { left: 0; }
+body.phone-controls .aim-zone { right: 0; }
+
+body.phone-controls .virtual-stick {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%);
+  border: 2px solid color-mix(in srgb, var(--arena) 55%, transparent);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .18);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, .35), 0 0 12px color-mix(in srgb, var(--arena) 18%, transparent);
+  opacity: 0;
+  transition: opacity .08s linear;
+  pointer-events: none;
+}
+
+body.phone-controls .touch-zone.active .virtual-stick {
+  opacity: .55;
+}
+
+body.phone-controls .stick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  border: 2px solid var(--arena);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--arena) 18%, rgba(0, 0, 0, .55));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--arena) 38%, transparent);
+}
+
+body.phone-controls .aim-zone .stick-knob {
+  border-color: var(--warning);
+  box-shadow: 0 0 12px rgba(255, 255, 0, .32);
+}
+
+body.phone-controls .stick-label {
+  position: absolute;
+  left: 50%;
+  bottom: -21px;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, .72);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px #000;
+}
+
+body.phone-controls .mobile-orientation-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, .94);
+  color: var(--warning);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: .05em;
+}
+
+@media (orientation: portrait) {
+  body.phone-controls .mobile-control-layer {
+    display: none;
+  }
+
+  body.phone-controls .mobile-orientation-hint {
+    display: flex;
+  }
+}
+
+@media (orientation: landscape) and (pointer: coarse) {
+  body.phone-controls .match-screen {
+    padding: max(2px, env(safe-area-inset-top)) max(3px, env(safe-area-inset-right)) max(2px, env(safe-area-inset-bottom)) max(3px, env(safe-area-inset-left));
+  }
+
+  body.phone-controls .match-hud {
+    min-height: calc(40px * var(--hud-scale));
+    padding-top: calc(2px * var(--hud-scale));
+    padding-bottom: calc(2px * var(--hud-scale));
+  }
+
+  body.phone-controls .hp-segment {
+    width: calc(21px * var(--hud-scale));
+    height: calc(10px * var(--hud-scale));
+  }
+
+  body.phone-controls .match-center {
+    min-width: calc(120px * var(--hud-scale));
+  }
+
+  body.phone-controls .score {
+    font-size: calc(20px * var(--hud-scale));
+  }
+
+  body.phone-controls .round-line {
+    font-size: calc(8px * var(--hud-scale));
+  }
+
+  body.phone-controls .pause-icon {
+    width: calc(30px * var(--hud-scale));
+    height: calc(30px * var(--hud-scale));
+  }
+
+  body.phone-controls .arena-wrap {
+    width: min(100%, calc((100dvh - 48px) * 2));
+    border-width: 3px;
+  }
+
+  body.phone-controls .arena-overlay.countdown .overlay-title {
+    font-size: clamp(70px, 25vh, 150px);
+  }
+}
