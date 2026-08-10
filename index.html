@@ -6,6 +6,7 @@
   <meta name="description" content="Tank Pong Simulator — a reverse-Pong tank duel for desktop and mobile.">
   <title>Tank Pong Simulator</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mobile-controls.css">
 </head>
 <body>
   <main class="app-shell">
@@ -141,7 +142,17 @@
               <li><strong>Hold Left Mouse:</strong> fire whenever the cooldown is ready.</li>
               <li><strong>P:</strong> pause single-player only.</li>
             </ul>
-            <p class="guide-note">Phone build: left stick moves; the right aim stick fires automatically only while that stick is actively being used.</p>
+          </section>
+
+          <section class="guide-card">
+            <h2>PHONE CONTROLS</h2>
+            <ul>
+              <li><strong>Landscape orientation</strong> is required during a match.</li>
+              <li><strong>Left thumb:</strong> touch and drag to create a floating movement stick.</li>
+              <li><strong>Right thumb:</strong> touch and drag to create a floating aim stick.</li>
+              <li><strong>Aim stick engaged:</strong> the tank automatically fires whenever its cooldown is ready.</li>
+              <li><strong>Release the aim stick:</strong> firing stops.</li>
+            </ul>
           </section>
         </div>
 
@@ -187,6 +198,26 @@
       <section class="arena-wrap" id="arenaWrap" aria-label="Tank Pong battlefield">
         <canvas id="gameCanvas" width="1200" height="600"></canvas>
         <div class="divider" aria-hidden="true"></div>
+
+        <div class="mobile-control-layer" id="mobileControlLayer" hidden aria-hidden="true">
+          <div class="touch-zone move-zone" id="moveZone">
+            <div class="virtual-stick" id="moveStick">
+              <div class="stick-knob" id="moveKnob"></div>
+              <span class="stick-label">MOVE</span>
+            </div>
+          </div>
+          <div class="touch-zone aim-zone" id="aimZone">
+            <div class="virtual-stick" id="aimStick">
+              <div class="stick-knob" id="aimKnob"></div>
+              <span class="stick-label">AIM · FIRE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-orientation-hint" id="mobileOrientationHint" hidden>
+          ROTATE YOUR PHONE TO LANDSCAPE TO PLAY
+        </div>
+
         <div class="arena-overlay" id="arenaOverlay" hidden>
           <div class="overlay-card" id="overlayCard">
             <div class="overlay-kicker" id="overlayKicker"></div>
@@ -200,5 +231,6 @@
   </main>
 
   <script src="game.js" defer></script>
+  <script src="mobile-controls.js" defer></script>
 </body>
 </html>
